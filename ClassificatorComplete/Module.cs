@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace ClassificatorComplete
 {
@@ -29,15 +30,27 @@ namespace ClassificatorComplete
                 panel = tryPanels.First();
             }
 
-            PushButton btnHostMark = panel.AddItem(new PushButtonData(
+            PushButtonData btnHostMark = new PushButtonData(
                 "ClassificatorCompleteCommand",
-                "ClassificatorComplete",
+                "Заполнить\nклассификатор",
                 assemblyPath,
-                "ClassificatorComplete.Command")
-                ) as PushButton;
+                "ClassificatorComplete.Command");
 
+            btnHostMark.LargeImage = PngImageSource("ClassificatorComplete.Resources.icon_manager.png");
+            btnHostMark.Image = PngImageSource("ClassificatorComplete.Resources.icon_manager.png");
+            btnHostMark.ToolTip = "Заполняет классификатор согласно выбранному XML файлу";
+            panel.AddItem(btnHostMark);
 
             return Result.Succeeded;
+        }
+
+        private System.Windows.Media.ImageSource PngImageSource(string embeddedPathname)
+        {
+            System.IO.Stream st = this.GetType().Assembly.GetManifestResourceStream(embeddedPathname);
+
+            PngBitmapDecoder decoder = new PngBitmapDecoder(st, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+
+            return decoder.Frames[0];
         }
 
         public Result Close()

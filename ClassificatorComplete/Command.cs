@@ -48,7 +48,8 @@ namespace ClassificatorComplete
                 BuiltInCategory.OST_GenericModel, //Обобщённые модели
 				BuiltInCategory.OST_Floors,
                 BuiltInCategory.OST_Walls,
-                BuiltInCategory.OST_StructuralFoundation
+                BuiltInCategory.OST_StructuralFoundation,
+                BuiltInCategory.OST_Stairs //Архитектурные лестницы
             };
 
                 List<Element> constrsTypes = new FilteredElementCollector(doc).WhereElementIsElementType()
@@ -74,10 +75,10 @@ namespace ClassificatorComplete
                         {
                             bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
                             bool familyNameCatch = elem.FamilyName.Contains(classificator.FamilyName);
-                            bool typeNameCatch = elem.Name.Contains(classificator.TypeName);
+                            bool typeNameCatch = typeNameCheck(classificator.TypeName, elem.Name);
                             bool familyNameNotExist = classificator.FamilyName.Length == 0;
                             bool typeNameNotExist = classificator.TypeName.Length == 0;
-                            
+
                             if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
                             {
                                 Print("1", KPLN_Loader.Preferences.MessageType.System_OK);
@@ -125,6 +126,31 @@ namespace ClassificatorComplete
                 PrintError(e);
                 return Result.Failed;
             }
+        }
+        public static bool typeNameCheck(string typeNameClafi, string typeNameElem)
+        {
+            string[] arrayClafi = typeNameClafi.Split(',');
+            int index = arrayClafi.Length;
+
+            if (index == 1)
+            {
+                if (typeNameElem.Contains(arrayClafi.First()))
+                {
+                    return true;
+                }
+                return false;
+            }
+            else if (index > 1)
+            {
+                for (int i = 0; i < index; i++)
+                {
+                    if (typeNameElem.Contains(arrayClafi[i])) continue;
+                    else return false;
+                }
+                return true;
+            }
+
+            return false;
         }
     }
 }
