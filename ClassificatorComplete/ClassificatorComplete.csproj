@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="KPLN_Loader">
-      <HintPath>Z:\Отдел BIM\03_Скрипты\09_Модули_KPLN_Loader\Setup\2020\KPLN_Loader\KPLN_Loader.dll</HintPath>
+      <HintPath>..\..\..\..\Перфильев Игорь\Репозитории\KPLN_Loader\bin\Debug\KPLN_Loader.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />

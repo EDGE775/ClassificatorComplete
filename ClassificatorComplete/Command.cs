@@ -41,16 +41,7 @@ namespace ClassificatorComplete
                 if (storage.LinkedFilesPrefix == null) storage.LinkedFilesPrefix = "#";
 
                 //Получаем список конструкций для заполнения классификатора:
-
-                List<BuiltInCategory> constrCats = new List<BuiltInCategory> {
-                BuiltInCategory.OST_StructuralFraming, //Каркас несущий
-				BuiltInCategory.OST_StructuralColumns,
-                BuiltInCategory.OST_GenericModel, //Обобщённые модели
-				BuiltInCategory.OST_Floors,
-                BuiltInCategory.OST_Walls,
-                BuiltInCategory.OST_StructuralFoundation,
-                BuiltInCategory.OST_Stairs //Архитектурные лестницы
-            };
+                List<BuiltInCategory> constrCats = storage.constrCats;
 
                 List<Element> constrsTypes = new FilteredElementCollector(doc).WhereElementIsElementType()
                     .WherePasses(new ElementMulticategoryFilter(constrCats))
@@ -74,8 +65,8 @@ namespace ClassificatorComplete
                         foreach (ClassificatorByCategory classificator in storage.classificatorByCategory)
                         {
                             bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
-                            bool familyNameCatch = elem.FamilyName.Contains(classificator.FamilyName);
-                            bool typeNameCatch = typeNameCheck(classificator.TypeName, elem.Name);
+                            bool familyNameCatch = nameChecker(classificator.FamilyName, elem.FamilyName);
+                            bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);
                             bool familyNameNotExist = classificator.FamilyName.Length == 0;
                             bool typeNameNotExist = classificator.TypeName.Length == 0;
 
@@ -127,14 +118,14 @@ namespace ClassificatorComplete
                 return Result.Failed;
             }
         }
-        public static bool typeNameCheck(string typeNameClafi, string typeNameElem)
+        public static bool nameChecker(string nameClafi, string nameElem)
         {
-            string[] arrayClafi = typeNameClafi.Split(',');
+            string[] arrayClafi = nameClafi.ToLower().Split(',');
             int index = arrayClafi.Length;
 
             if (index == 1)
             {
-                if (typeNameElem.Contains(arrayClafi.First()))
+                if (nameElem.ToLower().Contains(arrayClafi.First()))
                 {
                     return true;
                 }
@@ -144,7 +135,7 @@ namespace ClassificatorComplete
             {
                 for (int i = 0; i < index; i++)
                 {
-                    if (typeNameElem.Contains(arrayClafi[i])) continue;
+                    if (nameElem.ToLower().Contains(arrayClafi[i])) continue;
                     else return false;
                 }
                 return true;
