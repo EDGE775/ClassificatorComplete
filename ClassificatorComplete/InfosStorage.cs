@@ -10,11 +10,13 @@ namespace ClassificatorComplete
     [Serializable]
     public class InfosStorage
     {
-        public string ConfigurationName;
-        public string LinkedFilesPrefix;
-
-        public List<ClassificatorByCategory> classificatorByCategory;
         public List<BuiltInCategory> constrCats;
+        public List<ClassificatorByCategory> classificatorByCategory;
+
+        public string classCodeParam;
+        public string classNameParam;
+        public List<BuiltInCategory> constrCatsByInstanse;
+        public List<ClassificatorByInstanse> classificatorByInstanse;
 
         public InfosStorage()
         {

@@ -21,95 +21,168 @@ namespace ClassificatorComplete
             {
                 Document doc = commandData.Application.ActiveUIDocument.Document;
 
-                string dllPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string folder = System.IO.Path.GetDirectoryName(dllPath);
-
-                System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
-                dialog.InitialDirectory = folder;
-                dialog.Multiselect = false;
-                dialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
-                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return Result.Cancelled;
-                string xmlFilePath = dialog.FileName;
-
-                InfosStorage storage = new InfosStorage();
-                System.Xml.Serialization.XmlSerializer serializer =
-                    new System.Xml.Serialization.XmlSerializer(typeof(InfosStorage));
-                using (StreamReader r = new StreamReader(xmlFilePath))
+                StorageUtils utils = new StorageUtils();
+                InfosStorage storage = utils.getStorage();
+                if (storage == null)
                 {
-                    storage = (InfosStorage)serializer.Deserialize(r);
+                    Print("Не удалось обработать конфигурационный файл!", KPLN_Loader.Preferences.MessageType.Error);
+                    return Result.Cancelled;
                 }
-                if (storage.LinkedFilesPrefix == null) storage.LinkedFilesPrefix = "#";
 
-                //Получаем список конструкций для заполнения классификатора:
+                //Получаем список категорий для заполнения классификатора по типу:
                 List<BuiltInCategory> constrCats = storage.constrCats;
+                //Получаем список категорий для заполнения классификатора по экземпляру:
+                List<BuiltInCategory> constrCatsByInstanse = storage.constrCatsByInstanse;
 
-                List<Element> constrsTypes = new FilteredElementCollector(doc).WhereElementIsElementType()
-                    .WherePasses(new ElementMulticategoryFilter(constrCats))
-                    .ToElements()
-                    .Where(i => i.get_Parameter(BuiltInParameter.UNIFORMAT_CODE) != null)
-                    .ToList();
-
-                if (constrsTypes == null || constrsTypes.Count == 0) throw new Exception("Не удалось получить элементы для заполнения!");
-                int counter = 0;
+                int typeCounter = 0;
+                int instanceCounter = 0;
 
                 using (Transaction t = new Transaction(doc))
                 {
                     t.Start("Заполнение классификаторов");
-                    foreach (ClassificatorByCategory classificator in storage.classificatorByCategory)
+
+                    if (constrCats.Count > 0)
                     {
-                        Print(string.Format("{0} - {1} - {2}", classificator.FamilyName, classificator.TypeName, classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.Code);
-                    }
-                    foreach (ElementType elem in constrsTypes)
-                    {
-                        Print(string.Format("{0}:{1}", elem.Name, elem.FamilyName), KPLN_Loader.Preferences.MessageType.System_Regular);
+                        List<Element> constrsTypes = new FilteredElementCollector(doc).WhereElementIsElementType()
+                            .WherePasses(new ElementMulticategoryFilter(constrCats))
+                            .ToElements()
+                            .Where(i => i.get_Parameter(BuiltInParameter.UNIFORMAT_CODE) != null)
+                            .ToList();
+
+                        if (constrsTypes == null || constrsTypes.Count == 0)
+                        {
+                            Print("Не удалось получить элементы для заполнения классиифкатора по типу!", KPLN_Loader.Preferences.MessageType.Error);
+                            return Result.Cancelled;
+                        }
+
                         foreach (ClassificatorByCategory classificator in storage.classificatorByCategory)
                         {
-                            bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
-                            bool familyNameCatch = nameChecker(classificator.FamilyName, elem.FamilyName);
-                            bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);
-                            bool familyNameNotExist = classificator.FamilyName.Length == 0;
-                            bool typeNameNotExist = classificator.TypeName.Length == 0;
-
-                            if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
-                            {
-                                Print("1", KPLN_Loader.Preferences.MessageType.System_OK);
-                                elem.get_Parameter(BuiltInParameter.UNIFORMAT_CODE).Set(classificator.ClassificatorName);
-                                counter++;
-                                break;
-                            }
-
-                            if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
-                            {
-                                Print("2", KPLN_Loader.Preferences.MessageType.System_OK);
-                                elem.get_Parameter(BuiltInParameter.UNIFORMAT_CODE).Set(classificator.ClassificatorName);
-                                counter++;
-                                break;
-                            }
-
-                            if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
-                            {
-                                Print("3", KPLN_Loader.Preferences.MessageType.System_OK);
-                                elem.get_Parameter(BuiltInParameter.UNIFORMAT_CODE).Set(classificator.ClassificatorName);
-                                counter++;
-                                break;
-                            }
-
-                            if (categoryCatch && familyNameNotExist && typeNameNotExist)
-                            {
-                                Print("4", KPLN_Loader.Preferences.MessageType.System_OK);
-                                elem.get_Parameter(BuiltInParameter.UNIFORMAT_CODE).Set(classificator.ClassificatorName);
-                                counter++;
-                                break;
-                            }
-                            //Print(string.Format("categoryCatch = {0} familyNameCatch = {1} typeNameCatch = {2} familyNameNotExist = {3} typeNameNotExist = {4}", categoryCatch.ToString(), familyNameCatch.ToString(),
-                            //    typeNameCatch.ToString(), familyNameNotExist.ToString(), typeNameNotExist.ToString()), KPLN_Loader.Preferences.MessageType.Error);
+                            Print(string.Format("{0} - {1} - {2}", classificator.FamilyName, classificator.TypeName, classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.Code);
                         }
+                        Print("Заполнение классификатора по типу", KPLN_Loader.Preferences.MessageType.Header);
+                        foreach (ElementType elem in constrsTypes)
+                        {
+                            Print(string.Format("{0}:{1}", elem.Name, elem.FamilyName), KPLN_Loader.Preferences.MessageType.System_Regular);
+                            foreach (ClassificatorByCategory classificator in storage.classificatorByCategory)
+                            {
+                                bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
+                                bool familyNameCatch = ParamUtils.nameChecker(classificator.FamilyName, elem.FamilyName);
+                                bool typeNameCatch = ParamUtils.nameChecker(classificator.TypeName, elem.Name);
+                                bool familyNameNotExist = classificator.FamilyName.Length == 0;
+                                bool typeNameNotExist = classificator.TypeName.Length == 0;
+
+                                if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
+                                {
+                                    Print("1", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setBuiltInParam(elem, BuiltInParameter.UNIFORMAT_CODE, classificator.ClassificatorName);
+                                    Print(string.Format("Был присвоен код: {0}", classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.System_OK);
+                                    typeCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
+                                {
+                                    Print("2", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setBuiltInParam(elem, BuiltInParameter.UNIFORMAT_CODE, classificator.ClassificatorName);
+                                    Print(string.Format("Был присвоен код: {0}", classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.System_OK);
+                                    typeCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
+                                {
+                                    Print("3", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setBuiltInParam(elem, BuiltInParameter.UNIFORMAT_CODE, classificator.ClassificatorName);
+                                    Print(string.Format("Был присвоен код: {0}", classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.System_OK);
+                                    typeCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && familyNameNotExist && typeNameNotExist)
+                                {
+                                    Print("4", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setBuiltInParam(elem, BuiltInParameter.UNIFORMAT_CODE, classificator.ClassificatorName);
+                                    Print(string.Format("Был присвоен код: {0}", classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.System_OK);
+                                    typeCounter++;
+                                    break;
+                                }
+                            }
+                        }
+
                     }
+
+                    if (constrCatsByInstanse.Count > 0)
+                    {
+                        List<Element> constrsInstances = new FilteredElementCollector(doc)
+                            .WhereElementIsNotElementType()
+                            .WherePasses(new ElementMulticategoryFilter(constrCatsByInstanse))
+                            .Where(i => i.LookupParameter(storage.classCodeParam) != null)
+                            .Where(i => i.LookupParameter(storage.classNameParam) != null)
+                            .ToList();
+                        if (constrsInstances == null || constrsInstances.Count == 0)
+                        {
+                            Print("Не удалось получить элементы для заполнения классиифкатора по экземпляру!", KPLN_Loader.Preferences.MessageType.Error);
+                            return Result.Cancelled;
+                        }
+                        foreach (ClassificatorByInstanse classificator in storage.classificatorByInstanse)
+                        {
+                            Print(string.Format("{0} - {1} - {2}", classificator.FamilyName, classificator.TypeName, classificator.ClassificatorName), KPLN_Loader.Preferences.MessageType.Code);
+                        }
+                        Print("Заполнение классификатора по экземпляру", KPLN_Loader.Preferences.MessageType.Header);
+                        foreach (Element elem in constrsInstances)
+                        {
+                            Print(string.Format("{0}:{1}", elem.Name, elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString()), KPLN_Loader.Preferences.MessageType.System_Regular);
+                            foreach (ClassificatorByInstanse classificator in storage.classificatorByInstanse)
+                            {
+                                bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
+                                bool familyNameCatch = ParamUtils.nameChecker(classificator.FamilyName, elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString());
+                                bool typeNameCatch = ParamUtils.nameChecker(classificator.TypeName, elem.Name);
+                                bool familyNameNotExist = classificator.FamilyName.Length == 0;
+                                bool typeNameNotExist = classificator.TypeName.Length == 0;
+
+                                if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
+                                {
+                                    Print("1", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setParam(elem, storage.classCodeParam, classificator.ClassificatorName);
+                                    ParamUtils.setParam(elem, storage.classNameParam, classificator.ClassificatorFullName);
+                                    instanceCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
+                                {
+                                    Print("2", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setParam(elem, storage.classCodeParam, classificator.ClassificatorName);
+                                    ParamUtils.setParam(elem, storage.classNameParam, classificator.ClassificatorFullName);
+                                    instanceCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
+                                {
+                                    Print("3", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setParam(elem, storage.classCodeParam, classificator.ClassificatorName);
+                                    ParamUtils.setParam(elem, storage.classNameParam, classificator.ClassificatorFullName);
+                                    instanceCounter++;
+                                    break;
+                                }
+
+                                if (categoryCatch && familyNameNotExist && typeNameNotExist)
+                                {
+                                    Print("4", KPLN_Loader.Preferences.MessageType.System_OK);
+                                    ParamUtils.setParam(elem, storage.classCodeParam, classificator.ClassificatorName);
+                                    ParamUtils.setParam(elem, storage.classNameParam, classificator.ClassificatorFullName);
+                                    instanceCounter++;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+
                     t.Commit();
                 }
-
-                TaskDialog.Show("Отчёт", "Обработано элементов: " + counter);
-
+                TaskDialog.Show("Отчёт", "Обработано элементов по типу: " + typeCounter + "\nОбработано элементов по экземпляру: " + instanceCounter);
                 return Result.Succeeded;
             }
             catch (Exception e)
@@ -117,31 +190,6 @@ namespace ClassificatorComplete
                 PrintError(e);
                 return Result.Failed;
             }
-        }
-        public static bool nameChecker(string nameClafi, string nameElem)
-        {
-            string[] arrayClafi = nameClafi.ToLower().Split(',');
-            int index = arrayClafi.Length;
-
-            if (index == 1)
-            {
-                if (nameElem.ToLower().Contains(arrayClafi.First()))
-                {
-                    return true;
-                }
-                return false;
-            }
-            else if (index > 1)
-            {
-                for (int i = 0; i < index; i++)
-                {
-                    if (nameElem.ToLower().Contains(arrayClafi[i])) continue;
-                    else return false;
-                }
-                return true;
-            }
-
-            return false;
         }
     }
 }
