@@ -7,8 +7,7 @@ namespace ClassificatorComplete
     [Serializable]
     public class ClassificatorByInstanse
     {
-        public string ClassificatorName;
-        public string ClassificatorFullName;
+        public List<string> paramsValues;
         public BuiltInCategory BuiltInName;
         public string FamilyName;
         public string TypeName;

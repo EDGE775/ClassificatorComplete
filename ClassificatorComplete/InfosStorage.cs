@@ -10,11 +10,11 @@ namespace ClassificatorComplete
     [Serializable]
     public class InfosStorage
     {
+        public bool debugMode;
         public List<BuiltInCategory> constrCats;
         public List<ClassificatorByCategory> classificatorByCategory;
 
-        public string classCodeParam;
-        public string classNameParam;
+        public List<string> instanseParams;
         public List<BuiltInCategory> constrCatsByInstanse;
         public List<ClassificatorByInstanse> classificatorByInstanse;
 
