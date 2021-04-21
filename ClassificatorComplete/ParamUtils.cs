@@ -10,6 +10,8 @@ namespace ClassificatorComplete
 {
     public class ParamUtils
     {
+        public List<Element> fullSuccessElems = new List<Element>();
+        public List<Element> notFullSuccessElems = new List<Element>();
         public static bool nameChecker(string nameClafi, string nameElem)
         {
             string[] arrayClafiAnd = nameClafi.ToLower().Split(',');
@@ -50,18 +52,80 @@ namespace ClassificatorComplete
             return false;
         }
 
-        public static bool setParam(Element elem, string paramName, string valueName)
+        public static bool setParam(Element elem, string paramName, string value)
         {
             bool rsl = false;
+            string newValue = value;
+            if (value.Contains("[") && value.Contains("]"))
+            {
+                char[] valueArray = value.ToCharArray();
+                Dictionary<string, string> foundParamsAndTheirValues = new Dictionary<string, string>();
+                for (int i = 0; i < valueArray.Length; i++)
+                {
+                    if (valueArray[i] == '[')
+                    {
+                        for (int j = i; j < valueArray.Length; j++)
+                        {
+                            if (valueArray[j] == ']')
+                            {
+                                string foundParamName = value.Substring(i, j - i + 1);
+                                string foundParamNameForGettingValue = foundParamName.Replace("]", "").Replace("[", "");
+                                string valueOfParam = null;
+                                if (foundParamName.Contains("*"))
+                                {
+                                    valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue.Split('*')[0]);
+                                    try
+                                    {
+                                        valueOfParam = multipleSourseParamOnMultiplier(valueOfParam, foundParamNameForGettingValue);
+
+                                        //double paramValue = double.Parse(valueOfParam);
+                                        //double multiplier = double.Parse(foundParamNameForGettingValue.Split('*')[1].Split('D')[0].Replace(".", ","));
+                                        //int digits = 0;
+                                        //if (foundParamNameForGettingValue.Contains("D"))
+                                        //{
+                                        //    int.TryParse(foundParamNameForGettingValue.Split('D')[1], out digits);
+                                        //}
+                                        //double result = paramValue * multiplier;
+                                        //valueOfParam = foundParamNameForGettingValue.Contains("D") ? Math.Round(result, digits == 0 ? 1 : digits).ToString() : Math.Round(result).ToString();
+                                    }
+                                    catch (Exception)
+                                    {
+                                        Print(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения xml файла. Значение не вписано в параметр: \"{1}\".", foundParamName, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                                        return rsl;
+                                    }
+                                }
+                                else
+                                {
+                                    valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue);
+                                }
+                                foundParamsAndTheirValues.Add(foundParamName, valueOfParam);
+                                break;
+                            }
+                        }
+                    }
+                }
+                foreach (string item in foundParamsAndTheirValues.Keys)
+                {
+                    string itemValue = foundParamsAndTheirValues[item];
+                    if (itemValue == null || itemValue.Length == 0)
+                    {
+                        Print(string.Format("Не заполнено значение параметра: \"{0}\" у элемента: {1} с id: {2}. Значение не вписано в параметр: \"{3}\".", item, elem.Name, elem.Id, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                        return rsl;
+                    }
+                    newValue = newValue.Replace(item, itemValue);
+                }
+            }
+
             try
             {
-                elem.LookupParameter(paramName).Set(valueName);
+                elem.LookupParameter(paramName).Set(newValue);
                 rsl = true;
             }
             catch (Exception)
             {
                 Print("Не удалось назначить параметр: " + paramName, KPLN_Loader.Preferences.MessageType.Warning);
             }
+
             return rsl;
         }
 
@@ -77,34 +141,7 @@ namespace ClassificatorComplete
             }
         }
 
-        //public static bool checkParams(Element elem, List<ClassificatorByInstanse> valuesNamesArray, InfosStorage storage)
-        //{
-        //    bool check = false;
-        //    List<Parameter> familyParams = elem.GetOrderedParameters().Where(i => i.StorageType == StorageType.String).ToList();
-        //    List<string> familyParamsStr = new List<string>();
-        //    familyParamsStr.Add("");
-        //    for (int i = 0; i < familyParams.Count; i++)
-        //    {
-        //        familyParamsStr.Add(familyParams[i].Definition.Name);
-        //    }
-        //    foreach (ClassificatorByInstanse names in valuesNamesArray)
-        //    {
-        //        for (int i = 0; i < names.paramsValues.Count; i++)
-        //        {
-        //            Print(names.paramsValues[i].Length.ToString() + " " + familyParamsStr.Contains(storage.instanseParams[i]).ToString(), KPLN_Loader.Preferences.MessageType.Regular);
-        //            if (names.paramsValues[i].Length == 0 && !familyParamsStr.Contains(storage.instanseParams[i]))
-        //            {
-        //                check = false;
-        //                break; 
-        //            }
-        //            check = true;
-        //        }
-        //        if (check) return true;
-        //    }
-        //    return false;
-        //}
-
-        public static void setClassificator(ClassificatorByInstanse classificator, InfosStorage storage, Element elem, bool check)
+        public void setClassificator(ClassificatorByInstanse classificator, InfosStorage storage, Element elem, bool check)
         {
             bool paramChecker;
             List<string> assignedValues = new List<string>();
@@ -125,10 +162,17 @@ namespace ClassificatorComplete
                     assignedValues.Add(classificator.paramsValues[i]);
                 }
             }
+            if (assignedValues.Count == Math.Min(classificator.paramsValues.Where(i => i.Length > 0).Count(), storage.instanseParams.Where(i => i.Length > 0).Count()))
+            {
+                fullSuccessElems.Add(elem);
+            }
+            else
+            {
+                notFullSuccessElems.Add(elem);
+            }
             if (check)
             {
                 Print(string.Format("Были присвоены значения: {0}", string.Join(", ", assignedValues)), KPLN_Loader.Preferences.MessageType.System_OK);
-
             }
         }
 
@@ -136,6 +180,10 @@ namespace ClassificatorComplete
         {
             string paramValue = null;
             Parameter paramObject = elem.LookupParameter(paramName);
+            if (paramObject == null)
+            {
+                paramObject = elem.Document.GetElement(elem.GetTypeId()).LookupParameter(paramName);
+            }
             try
             {
                 if (paramObject.StorageType == StorageType.String)
@@ -155,8 +203,21 @@ namespace ClassificatorComplete
                     Print("Не удалось определить тип параметра: " + paramName, KPLN_Loader.Preferences.MessageType.Error);
                 }
             }
-            catch (Exception) {}
+            catch (Exception) { }
             return paramValue;
+        }
+
+        private static string multipleSourseParamOnMultiplier(string valueOfParam, string foundParamNameForGettingValue) 
+        {
+            double paramValue = double.Parse(valueOfParam);
+            double multiplier = double.Parse(foundParamNameForGettingValue.Split('*')[1].Split('D')[0].Replace(".", ","));
+            int digits = 0;
+            if (foundParamNameForGettingValue.Contains("D"))
+            {
+                int.TryParse(foundParamNameForGettingValue.Split('D')[1], out digits);
+            }
+            double result = paramValue * multiplier;
+            return foundParamNameForGettingValue.Contains("D") ? Math.Round(result, digits == 0 ? 1 : digits).ToString() : Math.Round(result).ToString();
         }
     }
 }
