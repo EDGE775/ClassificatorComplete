@@ -141,7 +141,7 @@ namespace ClassificatorComplete
             }
         }
 
-        public void setClassificator(ClassificatorByInstanse classificator, InfosStorage storage, Element elem, bool check)
+        public void setClassificator(ClassificatorBy classificator, InfosStorage storage, Element elem, bool check)
         {
             bool paramChecker;
             List<string> assignedValues = new List<string>();

@@ -36,8 +36,8 @@ namespace ClassificatorComplete
                 assemblyPath,
                 "ClassificatorComplete.Command");
 
-            btnHostMark.LargeImage = PngImageSource("ClassificatorComplete.Resources.icon_manager.png");
-            btnHostMark.Image = PngImageSource("ClassificatorComplete.Resources.icon_manager.png");
+            btnHostMark.LargeImage = PngImageSource("ClassificatorComplete.Resources.Classificator_large.PNG");
+            btnHostMark.Image = PngImageSource("ClassificatorComplete.Resources.Classificator.PNG");
             btnHostMark.ToolTip = "Заполняет классификатор согласно выбранному XML файлу";
             panel.AddItem(btnHostMark);
 

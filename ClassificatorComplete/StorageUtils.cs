@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static KPLN_Loader.Output.Output;
 
 namespace ClassificatorComplete
 {
@@ -16,6 +17,7 @@ namespace ClassificatorComplete
             dialog.InitialDirectory = folder;
             dialog.Multiselect = false;
             dialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
+            string newFilePath = dialog.FileName;
             if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return null;
             string xmlFilePath = dialog.FileName;
 

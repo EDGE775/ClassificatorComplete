@@ -89,6 +89,7 @@
     <Compile Include="App.cs" />
     <Compile Include="ClassificatorByCategory.cs" />
     <Compile Include="ClassificatorByInstanse.cs" />
+    <Compile Include="ClassificatorBy.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="InfosStorage.cs" />
     <Compile Include="Module.cs" />
@@ -99,6 +100,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Classificator.xml" />
+    <EmbeddedResource Include="Resources\Classificator.PNG" />
+    <EmbeddedResource Include="Resources\Classificator_large.PNG" />
     <EmbeddedResource Include="Resources\icon_manager.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
