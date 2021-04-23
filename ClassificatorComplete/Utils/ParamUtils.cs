@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static KPLN_Loader.Output.Output;
+using static ClassificatorComplete.OutputDebug;
 
 namespace ClassificatorComplete
 {
@@ -12,7 +13,7 @@ namespace ClassificatorComplete
     {
         public List<Element> fullSuccessElems = new List<Element>();
         public List<Element> notFullSuccessElems = new List<Element>();
-        public static bool nameChecker(string nameClafi, string nameElem)
+        private bool nameChecker(string nameClafi, string nameElem)
         {
             string[] arrayClafiAnd = nameClafi.ToLower().Split(',');
             int index = arrayClafiAnd.Length;
@@ -52,7 +53,7 @@ namespace ClassificatorComplete
             return false;
         }
 
-        public static bool setParam(Element elem, string paramName, string value)
+        private static bool setParam(Element elem, string paramName, string value)
         {
             bool rsl = false;
             string newValue = value;
@@ -74,19 +75,10 @@ namespace ClassificatorComplete
                                 if (foundParamName.Contains("*"))
                                 {
                                     valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue.Split('*')[0]);
+                                    if (valueOfParam == null) return rsl;
                                     try
                                     {
                                         valueOfParam = multipleSourseParamOnMultiplier(valueOfParam, foundParamNameForGettingValue);
-
-                                        //double paramValue = double.Parse(valueOfParam);
-                                        //double multiplier = double.Parse(foundParamNameForGettingValue.Split('*')[1].Split('D')[0].Replace(".", ","));
-                                        //int digits = 0;
-                                        //if (foundParamNameForGettingValue.Contains("D"))
-                                        //{
-                                        //    int.TryParse(foundParamNameForGettingValue.Split('D')[1], out digits);
-                                        //}
-                                        //double result = paramValue * multiplier;
-                                        //valueOfParam = foundParamNameForGettingValue.Contains("D") ? Math.Round(result, digits == 0 ? 1 : digits).ToString() : Math.Round(result).ToString();
                                     }
                                     catch (Exception)
                                     {
@@ -97,6 +89,7 @@ namespace ClassificatorComplete
                                 else
                                 {
                                     valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue);
+                                    if (valueOfParam == null) return rsl;
                                 }
                                 foundParamsAndTheirValues.Add(foundParamName, valueOfParam);
                                 break;
@@ -141,7 +134,7 @@ namespace ClassificatorComplete
             }
         }
 
-        public void setClassificator(ClassificatorBy classificator, InfosStorage storage, Element elem, bool check)
+        private void setClassificator(Classificator classificator, InfosStorage storage, Element elem, bool check)
         {
             bool paramChecker;
             List<string> assignedValues = new List<string>();
@@ -182,7 +175,17 @@ namespace ClassificatorComplete
             Parameter paramObject = elem.LookupParameter(paramName);
             if (paramObject == null)
             {
-                paramObject = elem.Document.GetElement(elem.GetTypeId()).LookupParameter(paramName);
+                try
+                {
+                    paramObject = elem.Document.GetElement(elem.GetTypeId()).LookupParameter(paramName);
+                }
+                catch (Exception)
+                { }
+            }
+            if (paramObject == null)
+            {
+                Print(string.Format("В элементе: \"{0}\" c id: {1} не найден параметр: \"{2}\"", elem.Name, elem.Id, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                return paramValue;
             }
             try
             {
@@ -218,6 +221,58 @@ namespace ClassificatorComplete
             }
             double result = paramValue * multiplier;
             return foundParamNameForGettingValue.Contains("D") ? Math.Round(result, digits == 0 ? 1 : digits).ToString() : Math.Round(result).ToString();
+        }
+
+        public bool startClassification(List<Element> constrs, InfosStorage storage, Document doc)
+        {
+            if (constrs == null || constrs.Count == 0)
+            {
+                Print("Не удалось получить элементы для заполнения классиифкатора!", KPLN_Loader.Preferences.MessageType.Error);
+                return false;
+            }
+            foreach (Classificator classificator in storage.classificator)
+            {
+                PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), KPLN_Loader.Preferences.MessageType.Code, storage.debugMode);
+            }
+            PrintDebug("Заполнение классификатора ↑", KPLN_Loader.Preferences.MessageType.Header, storage.debugMode);
+
+            foreach (Element elem in constrs)
+            {
+                string familyName = elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString();
+                string validateFamilyName = familyName == null || familyName.Length == 0 ? (elem as ElementType).FamilyName : familyName;
+
+                PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, validateFamilyName, elem.Id.IntegerValue), KPLN_Loader.Preferences.MessageType.System_Regular, storage.debugMode);
+                foreach (Classificator classificator in storage.classificator)
+                {
+                    bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
+                    bool familyNameCatch = nameChecker(classificator.FamilyName, validateFamilyName);
+                    bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);
+                    bool familyNameNotExist = classificator.FamilyName.Length == 0;
+                    bool typeNameNotExist = classificator.TypeName.Length == 0;
+
+                    if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
+                    {
+                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        break;
+                    }
+                    if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
+                    {
+                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        break;
+                    }
+                    if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
+                    {
+                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        break;
+                    }
+                    if (categoryCatch && familyNameNotExist && typeNameNotExist)
+                    {
+                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        break;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

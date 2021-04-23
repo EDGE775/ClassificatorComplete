@@ -8,7 +8,7 @@ namespace ClassificatorComplete
 {
     public class StorageUtils
     {
-        public InfosStorage getStorage()
+        public InfosStorage getInfoStorage()
         {
             string dllPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string folder = System.IO.Path.GetDirectoryName(dllPath);

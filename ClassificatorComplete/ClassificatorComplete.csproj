@@ -87,22 +87,23 @@
   </Choose>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="ClassificatorByCategory.cs" />
-    <Compile Include="ClassificatorByInstanse.cs" />
-    <Compile Include="ClassificatorBy.cs" />
+    <Compile Include="Data\Classificator.cs" />
     <Compile Include="Command.cs" />
-    <Compile Include="InfosStorage.cs" />
+    <Compile Include="Data\InfosStorage.cs" />
     <Compile Include="Module.cs" />
-    <Compile Include="ParamUtils.cs" />
+    <Compile Include="Output\OutputDebug.cs" />
+    <Compile Include="Utils\ParamUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StorageUtils.cs" />
-    <Compile Include="ViewUtils.cs" />
+    <Compile Include="Utils\StorageUtils.cs" />
+    <Compile Include="Utils\ViewUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Classificator.xml" />
     <EmbeddedResource Include="Resources\Classificator.PNG" />
     <EmbeddedResource Include="Resources\Classificator_large.PNG" />
     <EmbeddedResource Include="Resources\icon_manager.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Классификатор_типы.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

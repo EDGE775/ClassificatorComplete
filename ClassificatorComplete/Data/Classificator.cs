@@ -1,17 +1,20 @@
-﻿using Autodesk.Revit.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.Revit.DB;
 
 namespace ClassificatorComplete
 {
-    public abstract class ClassificatorBy
+    [Serializable]
+    public class Classificator
     {
         public List<string> paramsValues;
         public BuiltInCategory BuiltInName;
         public string FamilyName;
         public string TypeName;
+
+        public Classificator()
+        {
+
+        }
     }
 }

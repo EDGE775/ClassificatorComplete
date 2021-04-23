@@ -11,13 +11,10 @@ namespace ClassificatorComplete
     public class InfosStorage
     {
         public bool debugMode;
-        public List<string> typeParams;
-        public List<BuiltInCategory> constrCats;
-        public List<ClassificatorByCategory> classificatorByCategory;
-
+        public int instanceOrType;
         public List<string> instanseParams;
-        public List<BuiltInCategory> constrCatsByInstanse;
-        public List<ClassificatorByInstanse> classificatorByInstanse;
+        public List<BuiltInCategory> constrCats;
+        public List<Classificator> classificator;
 
         public InfosStorage()
         {
