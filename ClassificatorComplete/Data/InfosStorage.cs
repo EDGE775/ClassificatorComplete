@@ -13,7 +13,6 @@ namespace ClassificatorComplete
         public bool debugMode;
         public int instanceOrType;
         public List<string> instanseParams;
-        public List<BuiltInCategory> constrCats;
         public List<Classificator> classificator;
 
         public InfosStorage()

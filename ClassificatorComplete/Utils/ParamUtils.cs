@@ -53,8 +53,9 @@ namespace ClassificatorComplete
             return false;
         }
 
-        private static bool setParam(Element elem, string paramName, string value)
+        private static bool setParam(Element elem, string paramName, string value, out string valueForAssigned)
         {
+            valueForAssigned = null;
             bool rsl = false;
             string newValue = value;
             if (value.Contains("[") && value.Contains("]"))
@@ -112,6 +113,7 @@ namespace ClassificatorComplete
             try
             {
                 elem.LookupParameter(paramName).Set(newValue);
+                valueForAssigned = newValue;
                 rsl = true;
             }
             catch (Exception)
@@ -149,10 +151,10 @@ namespace ClassificatorComplete
             for (int i = 0; i < Math.Min(classificator.paramsValues.Count, storage.instanseParams.Count); i++)
             {
                 if (classificator.paramsValues[i].Length == 0) continue;
-                paramChecker = setParam(elem, storage.instanseParams[i], classificator.paramsValues[i]);
+                paramChecker = setParam(elem, storage.instanseParams[i], classificator.paramsValues[i], out string valueForAssigned);
                 if (paramChecker)
                 {
-                    assignedValues.Add(classificator.paramsValues[i]);
+                    assignedValues.Add(valueForAssigned);
                 }
             }
             if (assignedValues.Count == Math.Min(classificator.paramsValues.Where(i => i.Length > 0).Count(), storage.instanseParams.Where(i => i.Length > 0).Count()))
@@ -165,7 +167,7 @@ namespace ClassificatorComplete
             }
             if (check)
             {
-                Print(string.Format("Были присвоены значения: {0}", string.Join(", ", assignedValues)), KPLN_Loader.Preferences.MessageType.System_OK);
+                Print(string.Format("Были присвоены значения: {0}", string.Join("; ", assignedValues)), KPLN_Loader.Preferences.MessageType.System_OK);
             }
         }
 

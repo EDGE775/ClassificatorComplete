@@ -51,6 +51,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -90,6 +91,13 @@
     <Compile Include="Data\Classificator.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Data\InfosStorage.cs" />
+    <Compile Include="Data\UtilsStorage.cs" />
+    <Compile Include="Forms\ClassificatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ClassificatorForm.Designer.cs">
+      <DependentUpon>ClassificatorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Module.cs" />
     <Compile Include="Output\OutputDebug.cs" />
     <Compile Include="Utils\ParamUtils.cs" />
@@ -98,6 +106,9 @@
     <Compile Include="Utils\ViewUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\ClassificatorForm.resx">
+      <DependentUpon>ClassificatorForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Classificator.PNG" />
     <EmbeddedResource Include="Resources\Classificator_large.PNG" />
     <EmbeddedResource Include="Resources\icon_manager.png" />

@@ -10,6 +10,7 @@ using System.IO;
 using System.Xml;
 using static KPLN_Loader.Output.Output;
 using Autodesk.Revit.UI.Selection;
+using ClassificatorComplete.Data;
 
 namespace ClassificatorComplete
 {
@@ -30,7 +31,7 @@ namespace ClassificatorComplete
                 return Result.Cancelled;
             }
 
-            List<BuiltInCategory> constrCats = storage.constrCats;
+            List<BuiltInCategory> constrCats = storage.classificator.Select(x => x.BuiltInName).ToHashSet().ToList();
 
             using (Transaction t = new Transaction(doc))
             {
@@ -85,6 +86,21 @@ namespace ClassificatorComplete
                     {
                         ViewUtils viewUtils = new ViewUtils(doc);
 
+                        OverrideGraphicSettings overrideGraphic = ViewUtils.getStandartGraphicSettings(doc);
+                        List<Element> elems = new FilteredElementCollector(doc, activeView.Id)
+                             .WhereElementIsNotElementType()
+                             .ToElements()
+                             .ToList();
+
+                        foreach (Element elem in elems)
+                        {
+                            if (elem is Group) continue;
+                            try
+                            {
+                                activeView.SetElementOverrides(elem.Id, overrideGraphic);
+                            }
+                            catch { }
+                        }
                         foreach (Element elem in utilsForInstanse.fullSuccessElems)
                         {
                             if (elem is Group) continue;

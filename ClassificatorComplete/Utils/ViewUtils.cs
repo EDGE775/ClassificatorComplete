@@ -61,5 +61,21 @@ namespace ClassificatorComplete
 
             return overrideGraphic;
         }
+
+        public static OverrideGraphicSettings getStandartGraphicSettings(Document doc)
+        {
+            OverrideGraphicSettings overrideGraphic = new OverrideGraphicSettings();
+#if Revit2018
+            overrideGraphic.SetProjectionFillPatternId(ElementId.InvalidElementId);
+            overrideGraphic.SetProjectionFillColor(Color.InvalidColorValue);
+#endif
+#if Revit2020
+            overrideGraphic.SetSurfaceForegroundPatternId(ElementId.InvalidElementId);
+            overrideGraphic.SetSurfaceForegroundPatternColor(Color.InvalidColorValue);
+#endif
+            overrideGraphic.SetProjectionLineColor(Color.InvalidColorValue);
+
+            return overrideGraphic;
+        }
     }
 }
