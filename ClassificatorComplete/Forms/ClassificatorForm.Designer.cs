@@ -29,7 +29,6 @@ namespace ClassificatorComplete.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -39,25 +38,14 @@ namespace ClassificatorComplete.Forms
             this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.buttonChooseFile = new System.Windows.Forms.Button();
             this.textBoxFileInfo = new System.Windows.Forms.TextBox();
+            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // listBox1
-            // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 220);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listBox1.Size = new System.Drawing.Size(260, 147);
-            this.listBox1.TabIndex = 4;
             // 
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancel.Location = new System.Drawing.Point(12, 383);
+            this.btnCancel.Location = new System.Drawing.Point(12, 430);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -68,7 +56,7 @@ namespace ClassificatorComplete.Forms
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(131, 383);
+            this.btnOk.Location = new System.Drawing.Point(171, 430);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(141, 23);
             this.btnOk.TabIndex = 2;
@@ -78,8 +66,9 @@ namespace ClassificatorComplete.Forms
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 204);
+            this.label1.Location = new System.Drawing.Point(9, 261);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(219, 13);
             this.label1.TabIndex = 3;
@@ -96,6 +85,7 @@ namespace ClassificatorComplete.Forms
             this.radioButtonInstanceParams.TabStop = true;
             this.radioButtonInstanceParams.Text = "Заполнить по экземпляру";
             this.radioButtonInstanceParams.UseVisualStyleBackColor = true;
+            this.radioButtonInstanceParams.CheckedChanged += new System.EventHandler(this.radioButtonInstanceParams_CheckedChanged);
             // 
             // radioButtonTypeParams
             // 
@@ -106,6 +96,7 @@ namespace ClassificatorComplete.Forms
             this.radioButtonTypeParams.TabIndex = 5;
             this.radioButtonTypeParams.Text = "Заполнить по типу";
             this.radioButtonTypeParams.UseVisualStyleBackColor = true;
+            this.radioButtonTypeParams.CheckedChanged += new System.EventHandler(this.radioButtonTypeParams_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -115,7 +106,7 @@ namespace ClassificatorComplete.Forms
             this.groupBox1.Controls.Add(this.radioButtonInstanceParams);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(260, 71);
+            this.groupBox1.Size = new System.Drawing.Size(300, 71);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Алгоритм";
@@ -131,12 +122,15 @@ namespace ClassificatorComplete.Forms
             this.checkBoxDebug.TabIndex = 7;
             this.checkBoxDebug.Text = "Вывести лог работы плагина";
             this.checkBoxDebug.UseVisualStyleBackColor = true;
+            this.checkBoxDebug.CheckedChanged += new System.EventHandler(this.checkBoxDebug_CheckedChanged);
             // 
             // buttonChooseFile
             // 
+            this.buttonChooseFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonChooseFile.Location = new System.Drawing.Point(12, 117);
             this.buttonChooseFile.Name = "buttonChooseFile";
-            this.buttonChooseFile.Size = new System.Drawing.Size(260, 23);
+            this.buttonChooseFile.Size = new System.Drawing.Size(300, 23);
             this.buttonChooseFile.TabIndex = 8;
             this.buttonChooseFile.Text = "Выбрать файл конфигурации";
             this.buttonChooseFile.UseVisualStyleBackColor = true;
@@ -144,19 +138,34 @@ namespace ClassificatorComplete.Forms
             // 
             // textBoxFileInfo
             // 
+            this.textBoxFileInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxFileInfo.Location = new System.Drawing.Point(12, 146);
             this.textBoxFileInfo.Multiline = true;
             this.textBoxFileInfo.Name = "textBoxFileInfo";
             this.textBoxFileInfo.ReadOnly = true;
             this.textBoxFileInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxFileInfo.Size = new System.Drawing.Size(260, 55);
+            this.textBoxFileInfo.Size = new System.Drawing.Size(300, 112);
             this.textBoxFileInfo.TabIndex = 9;
+            // 
+            // checkedListBox1
+            // 
+            this.checkedListBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkedListBox1.CheckOnClick = true;
+            this.checkedListBox1.FormattingEnabled = true;
+            this.checkedListBox1.Location = new System.Drawing.Point(12, 277);
+            this.checkedListBox1.Name = "checkedListBox1";
+            this.checkedListBox1.Size = new System.Drawing.Size(300, 139);
+            this.checkedListBox1.TabIndex = 10;
             // 
             // ClassificatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 415);
+            this.ClientSize = new System.Drawing.Size(324, 462);
+            this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.textBoxFileInfo);
             this.Controls.Add(this.buttonChooseFile);
             this.Controls.Add(this.checkBoxDebug);
@@ -164,8 +173,7 @@ namespace ClassificatorComplete.Forms
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.listBox1);
-            this.MinimumSize = new System.Drawing.Size(300, 377);
+            this.MinimumSize = new System.Drawing.Size(340, 500);
             this.Name = "ClassificatorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Классификация";
@@ -177,8 +185,6 @@ namespace ClassificatorComplete.Forms
         }
 
         #endregion
-
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Label label1;
@@ -188,5 +194,6 @@ namespace ClassificatorComplete.Forms
         private System.Windows.Forms.CheckBox checkBoxDebug;
         private System.Windows.Forms.Button buttonChooseFile;
         private System.Windows.Forms.TextBox textBoxFileInfo;
+        private System.Windows.Forms.CheckedListBox checkedListBox1;
     }
 }

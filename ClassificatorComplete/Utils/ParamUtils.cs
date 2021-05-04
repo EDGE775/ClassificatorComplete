@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static KPLN_Loader.Output.Output;
 using static ClassificatorComplete.OutputDebug;
+using Autodesk.Revit.DB.Architecture;
 
 namespace ClassificatorComplete
 {
@@ -13,6 +14,13 @@ namespace ClassificatorComplete
     {
         public List<Element> fullSuccessElems = new List<Element>();
         public List<Element> notFullSuccessElems = new List<Element>();
+        private bool debugMode;
+
+        public ParamUtils(bool debugMode)
+        {
+            this.debugMode = debugMode;
+        }
+
         private bool nameChecker(string nameClafi, string nameElem)
         {
             string[] arrayClafiAnd = nameClafi.ToLower().Split(',');
@@ -234,42 +242,62 @@ namespace ClassificatorComplete
             }
             foreach (Classificator classificator in storage.classificator)
             {
-                PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), KPLN_Loader.Preferences.MessageType.Code, storage.debugMode);
+                PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), KPLN_Loader.Preferences.MessageType.Code, debugMode);
             }
-            PrintDebug("Заполнение классификатора ↑", KPLN_Loader.Preferences.MessageType.Header, storage.debugMode);
+            PrintDebug("Заполнение классификатора ↑", KPLN_Loader.Preferences.MessageType.Header, debugMode);
 
             foreach (Element elem in constrs)
             {
-                string familyName = elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString();
-                string validateFamilyName = familyName == null || familyName.Length == 0 ? (elem as ElementType).FamilyName : familyName;
+                string familyName = null;
+                if (elem is Room)
+                {
+                    familyName = elem.get_Parameter(BuiltInParameter.ROOM_DEPARTMENT).AsString();
+                }
+                else
+                {
+                    try
+                    {
+                        familyName = elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString();
+                    }
+                    catch (Exception) { }
+                    familyName = familyName == null || familyName.Length == 0 ? (elem as ElementType).FamilyName : familyName;
+                }
 
-                PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, validateFamilyName, elem.Id.IntegerValue), KPLN_Loader.Preferences.MessageType.System_Regular, storage.debugMode);
+                PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), KPLN_Loader.Preferences.MessageType.System_Regular, debugMode);
                 foreach (Classificator classificator in storage.classificator)
                 {
-                    bool categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
-                    bool familyNameCatch = nameChecker(classificator.FamilyName, validateFamilyName);
+                    bool categoryCatch = false;
+                    try
+                    {
+                        categoryCatch = Category.GetCategory(doc, classificator.BuiltInName).Id.IntegerValue == elem.Category.Id.IntegerValue;
+                    }
+                    catch (Exception)
+                    {
+                        Print(string.Format("Не удалось определить категорию: {0}. Возможно, она введена неверно.", classificator.BuiltInName), KPLN_Loader.Preferences.MessageType.Error);
+                    }
+                    bool familyNameCatch = nameChecker(classificator.FamilyName, familyName);
                     bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);
                     bool familyNameNotExist = classificator.FamilyName.Length == 0;
                     bool typeNameNotExist = classificator.TypeName.Length == 0;
 
                     if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        setClassificator(classificator, storage, elem, debugMode);
                         break;
                     }
                     if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        setClassificator(classificator, storage, elem, debugMode);
                         break;
                     }
                     if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        setClassificator(classificator, storage, elem, debugMode);
                         break;
                     }
                     if (categoryCatch && familyNameNotExist && typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, storage.debugMode);
+                        setClassificator(classificator, storage, elem, debugMode);
                         break;
                     }
                 }

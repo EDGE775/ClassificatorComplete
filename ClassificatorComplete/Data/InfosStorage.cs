@@ -10,7 +10,6 @@ namespace ClassificatorComplete
     [Serializable]
     public class InfosStorage
     {
-        public bool debugMode;
         public int instanceOrType;
         public List<string> instanseParams;
         public List<Classificator> classificator;

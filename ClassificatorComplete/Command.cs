@@ -11,6 +11,7 @@ using System.Xml;
 using static KPLN_Loader.Output.Output;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
+using ClassificatorComplete.Forms;
 
 namespace ClassificatorComplete
 {
@@ -24,20 +25,27 @@ namespace ClassificatorComplete
             View activeView = doc.ActiveView;
 
             StorageUtils utils = new StorageUtils();
-            InfosStorage storage = utils.getInfoStorage();
+
+            ClassificatorForm form = new ClassificatorForm(utils);
+            form.ShowDialog();
+            if (form.DialogResult != System.Windows.Forms.DialogResult.OK) return Result.Cancelled;
+
+            bool debugMode = form.debugMode;
+
+            InfosStorage storage = form.storage;
             if (storage == null)
             {
                 Print("Не удалось обработать конфигурационный файл!", KPLN_Loader.Preferences.MessageType.Error);
                 return Result.Cancelled;
             }
 
-            List<BuiltInCategory> constrCats = storage.classificator.Select(x => x.BuiltInName).ToHashSet().ToList();
+            List<BuiltInCategory> constrCats = form.checkedCats;
 
             using (Transaction t = new Transaction(doc))
             {
                 t.Start("Заполнение параметров классификатора");
 
-                if (storage.instanceOrType == 2)
+                if (form.instanceOrType == 2)
                 {
                     List<Element> constrsTypes;
 
@@ -58,12 +66,12 @@ namespace ClassificatorComplete
                             .ToList();
                     }
 
-                    ParamUtils utilsForType = new ParamUtils();
+                    ParamUtils utilsForType = new ParamUtils(debugMode);
                     utilsForType.startClassification(constrsTypes, storage, doc);
                     Print(string.Format("Обработано элементов: {0}", utilsForType.fullSuccessElems.Count + utilsForType.notFullSuccessElems.Count), KPLN_Loader.Preferences.MessageType.Success);
                 }
 
-                else if (storage.instanceOrType == 1)
+                else if (form.instanceOrType == 1)
                 {
                     List<Element> constrsInstances;
 
@@ -79,7 +87,7 @@ namespace ClassificatorComplete
                         constrsInstances = sel.GetElementIds().Select(elem => doc.GetElement(elem)).ToList();
                     }
 
-                    ParamUtils utilsForInstanse = new ParamUtils();
+                    ParamUtils utilsForInstanse = new ParamUtils(debugMode);
                     utilsForInstanse.startClassification(constrsInstances, storage, doc);
 
                     if (activeView.Name.Contains("3D"))
