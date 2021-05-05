@@ -39,6 +39,7 @@ namespace ClassificatorComplete.Forms
             this.buttonChooseFile = new System.Windows.Forms.Button();
             this.textBoxFileInfo = new System.Windows.Forms.TextBox();
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.buttonOpenConfiguration = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -106,7 +107,7 @@ namespace ClassificatorComplete.Forms
             this.groupBox1.Controls.Add(this.radioButtonInstanceParams);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(300, 71);
+            this.groupBox1.Size = new System.Drawing.Size(258, 71);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Алгоритм";
@@ -114,8 +115,6 @@ namespace ClassificatorComplete.Forms
             // checkBoxDebug
             // 
             this.checkBoxDebug.AutoSize = true;
-            this.checkBoxDebug.Checked = true;
-            this.checkBoxDebug.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxDebug.Location = new System.Drawing.Point(21, 89);
             this.checkBoxDebug.Name = "checkBoxDebug";
             this.checkBoxDebug.Size = new System.Drawing.Size(174, 17);
@@ -160,11 +159,23 @@ namespace ClassificatorComplete.Forms
             this.checkedListBox1.Size = new System.Drawing.Size(300, 139);
             this.checkedListBox1.TabIndex = 10;
             // 
+            // buttonOpenConfiguration
+            // 
+            this.buttonOpenConfiguration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOpenConfiguration.Location = new System.Drawing.Point(276, 20);
+            this.buttonOpenConfiguration.Name = "buttonOpenConfiguration";
+            this.buttonOpenConfiguration.Size = new System.Drawing.Size(36, 63);
+            this.buttonOpenConfiguration.TabIndex = 11;
+            this.buttonOpenConfiguration.Text = "Редактировать";
+            this.buttonOpenConfiguration.UseVisualStyleBackColor = true;
+            this.buttonOpenConfiguration.Click += new System.EventHandler(this.buttonOpenConfiguration_Click);
+            // 
             // ClassificatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(324, 462);
+            this.Controls.Add(this.buttonOpenConfiguration);
             this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.textBoxFileInfo);
             this.Controls.Add(this.buttonChooseFile);
@@ -195,5 +206,6 @@ namespace ClassificatorComplete.Forms
         private System.Windows.Forms.Button buttonChooseFile;
         private System.Windows.Forms.TextBox textBoxFileInfo;
         private System.Windows.Forms.CheckedListBox checkedListBox1;
+        private System.Windows.Forms.Button buttonOpenConfiguration;
     }
 }

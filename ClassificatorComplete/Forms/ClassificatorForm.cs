@@ -21,6 +21,7 @@ namespace ClassificatorComplete.Forms
         public bool debugMode;
         public int instanceOrType;
         public List<BuiltInCategory> checkedCats;
+        public ConfigurationForm form;
 
         public ClassificatorForm(StorageUtils utils)
         {
@@ -32,6 +33,7 @@ namespace ClassificatorComplete.Forms
             checkedCats = new List<BuiltInCategory>();
             if (radioButtonTypeParams.Checked) instanceOrType = 2;
             else if (radioButtonInstanceParams.Checked) instanceOrType = 1;
+            form = new ConfigurationForm(this);
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -115,6 +117,12 @@ namespace ClassificatorComplete.Forms
                 textBoxFileInfo.Text += "НЕКОРРЕКТНАЯ НАСТРОЙКА КОНФИГУРАЦИОННОГО ФАЙЛА!";
                 btnOk.Enabled = false;
             }
+        }
+
+        private void buttonOpenConfiguration_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            form.ShowDialog();
         }
     }
 }

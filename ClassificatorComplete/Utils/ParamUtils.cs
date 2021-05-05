@@ -28,11 +28,22 @@ namespace ClassificatorComplete
 
             if (index == 1)
             {
-                if (nameElem.ToLower().Contains(arrayClafiAnd.First()))
+                if (arrayClafiAnd.First().Contains('|'))
                 {
-                    return true;
+                    bool check = false;
+                    string[] arrayClafiOr = arrayClafiAnd.First().Split('|');
+                    for (int j = 0; j < arrayClafiOr.Length; j++)
+                    {
+                        if (nameElem.ToLower().Contains(arrayClafiOr[j]))
+                        {
+                            check = true;
+                            break;
+                        }
+                    }
+                    return check;
                 }
-                return false;
+
+                return nameElem.ToLower().Contains(arrayClafiAnd.First());
             }
             else if (index > 1)
             {
