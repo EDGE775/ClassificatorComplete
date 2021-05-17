@@ -62,12 +62,66 @@ namespace ClassificatorComplete
                 storage = (InfosStorage)serializer.Deserialize(r);
             }
 
+            if(!Directory.Exists("C:\\TEMP"))
+            {
+                Directory.CreateDirectory("C:\\TEMP");
+            }
+
             using (StreamWriter r = new StreamWriter("C:\\TEMP\\ccsettings.xml"))
             {
                 storageSerializer.Serialize(r, utilsStorage);
             }
 
             return storage;
+        }
+
+        public void saveInfoStorage(InfosStorage storage)
+        {
+            System.Xml.Serialization.XmlSerializer utilsSerializer =
+                  new System.Xml.Serialization.XmlSerializer(typeof(UtilsStorage));
+            System.Xml.Serialization.XmlSerializer infoStorageSerializer =
+                 new System.Xml.Serialization.XmlSerializer(typeof(InfosStorage));
+
+            UtilsStorage utilsStorage = null;
+            try
+            {
+                using (StreamReader r = new StreamReader("C:\\TEMP\\ccsettings.xml"))
+                {
+                    utilsStorage = (UtilsStorage)utilsSerializer.Deserialize(r);
+                }
+            }
+            catch (Exception) { }
+
+            if (utilsStorage == null)
+            {
+                string dllPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string folder = System.IO.Path.GetDirectoryName(dllPath);
+                utilsStorage = new UtilsStorage();
+                utilsStorage.path = folder;
+            }
+
+            System.Windows.Forms.SaveFileDialog storageDialog = new System.Windows.Forms.SaveFileDialog();
+            storageDialog.InitialDirectory = utilsStorage.path;
+            storageDialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
+            if (storageDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                xmlFilePath = storageDialog.FileName;
+            }
+
+            using (StreamWriter r = new StreamWriter(xmlFilePath))
+            {
+                infoStorageSerializer.Serialize(r, storage);
+            }
+
+            if (!Directory.Exists("C:\\TEMP"))
+            {
+                Directory.CreateDirectory("C:\\TEMP");
+            }
+
+            using (StreamWriter r = new StreamWriter("C:\\TEMP\\ccsettings.xml"))
+            {
+                utilsSerializer.Serialize(r, utilsStorage);
+            }
         }
     }
 }

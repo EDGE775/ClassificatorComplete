@@ -40,6 +40,8 @@ namespace ClassificatorComplete.Forms
             this.textBoxFileInfo = new System.Windows.Forms.TextBox();
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.buttonOpenConfiguration = new System.Windows.Forms.Button();
+            this.buttonCreateNewConfiguration = new System.Windows.Forms.Button();
+            this.buttonSaveFile = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -107,7 +109,7 @@ namespace ClassificatorComplete.Forms
             this.groupBox1.Controls.Add(this.radioButtonInstanceParams);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(258, 71);
+            this.groupBox1.Size = new System.Drawing.Size(208, 71);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Алгоритм";
@@ -125,11 +127,9 @@ namespace ClassificatorComplete.Forms
             // 
             // buttonChooseFile
             // 
-            this.buttonChooseFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonChooseFile.Location = new System.Drawing.Point(12, 117);
             this.buttonChooseFile.Name = "buttonChooseFile";
-            this.buttonChooseFile.Size = new System.Drawing.Size(300, 23);
+            this.buttonChooseFile.Size = new System.Drawing.Size(183, 23);
             this.buttonChooseFile.TabIndex = 8;
             this.buttonChooseFile.Text = "Выбрать файл конфигурации";
             this.buttonChooseFile.UseVisualStyleBackColor = true;
@@ -162,19 +162,43 @@ namespace ClassificatorComplete.Forms
             // buttonOpenConfiguration
             // 
             this.buttonOpenConfiguration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOpenConfiguration.Location = new System.Drawing.Point(276, 20);
+            this.buttonOpenConfiguration.Location = new System.Drawing.Point(226, 20);
             this.buttonOpenConfiguration.Name = "buttonOpenConfiguration";
-            this.buttonOpenConfiguration.Size = new System.Drawing.Size(36, 63);
+            this.buttonOpenConfiguration.Size = new System.Drawing.Size(86, 28);
             this.buttonOpenConfiguration.TabIndex = 11;
-            this.buttonOpenConfiguration.Text = "Редактировать";
+            this.buttonOpenConfiguration.Text = "Ред. файл";
             this.buttonOpenConfiguration.UseVisualStyleBackColor = true;
             this.buttonOpenConfiguration.Click += new System.EventHandler(this.buttonOpenConfiguration_Click);
+            // 
+            // buttonCreateNewConfiguration
+            // 
+            this.buttonCreateNewConfiguration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCreateNewConfiguration.Location = new System.Drawing.Point(226, 55);
+            this.buttonCreateNewConfiguration.Name = "buttonCreateNewConfiguration";
+            this.buttonCreateNewConfiguration.Size = new System.Drawing.Size(86, 28);
+            this.buttonCreateNewConfiguration.TabIndex = 12;
+            this.buttonCreateNewConfiguration.Text = "Новый файл";
+            this.buttonCreateNewConfiguration.UseVisualStyleBackColor = true;
+            this.buttonCreateNewConfiguration.Click += new System.EventHandler(this.buttonCreateNewConfiguration_Click);
+            // 
+            // buttonSaveFile
+            // 
+            this.buttonSaveFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonSaveFile.Location = new System.Drawing.Point(201, 117);
+            this.buttonSaveFile.Name = "buttonSaveFile";
+            this.buttonSaveFile.Size = new System.Drawing.Size(111, 23);
+            this.buttonSaveFile.TabIndex = 13;
+            this.buttonSaveFile.Text = "Сохранить файл";
+            this.buttonSaveFile.UseVisualStyleBackColor = true;
+            this.buttonSaveFile.Click += new System.EventHandler(this.buttonSaveFile_Click);
             // 
             // ClassificatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(324, 462);
+            this.Controls.Add(this.buttonSaveFile);
+            this.Controls.Add(this.buttonCreateNewConfiguration);
             this.Controls.Add(this.buttonOpenConfiguration);
             this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.textBoxFileInfo);
@@ -188,6 +212,7 @@ namespace ClassificatorComplete.Forms
             this.Name = "ClassificatorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Классификация";
+            this.VisibleChanged += new System.EventHandler(this.ClassificatorForm_VisibleChanged);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -207,5 +232,7 @@ namespace ClassificatorComplete.Forms
         private System.Windows.Forms.TextBox textBoxFileInfo;
         private System.Windows.Forms.CheckedListBox checkedListBox1;
         private System.Windows.Forms.Button buttonOpenConfiguration;
+        private System.Windows.Forms.Button buttonCreateNewConfiguration;
+        private System.Windows.Forms.Button buttonSaveFile;
     }
 }

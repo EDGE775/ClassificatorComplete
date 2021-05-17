@@ -30,6 +30,7 @@ namespace ClassificatorComplete.Forms
         private void InitializeComponent()
         {
             this.groupBox = new System.Windows.Forms.GroupBox();
+            this.buttonAcceptRule = new System.Windows.Forms.Button();
             this.groupBoxValueField = new System.Windows.Forms.GroupBox();
             this.textBoxField = new System.Windows.Forms.TextBox();
             this.buttonDeleteValueField = new System.Windows.Forms.Button();
@@ -46,7 +47,6 @@ namespace ClassificatorComplete.Forms
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.panelOfRules = new System.Windows.Forms.Panel();
-            this.buttonAcceptRule = new System.Windows.Forms.Button();
             this.groupBox.SuspendLayout();
             this.groupBoxValueField.SuspendLayout();
             this.panelOfRules.SuspendLayout();
@@ -70,6 +70,16 @@ namespace ClassificatorComplete.Forms
             this.groupBox.TabIndex = 0;
             this.groupBox.TabStop = false;
             this.groupBox.Text = "Правило 1";
+            // 
+            // buttonAcceptRule
+            // 
+            this.buttonAcceptRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAcceptRule.Location = new System.Drawing.Point(806, 15);
+            this.buttonAcceptRule.Name = "buttonAcceptRule";
+            this.buttonAcceptRule.Size = new System.Drawing.Size(27, 25);
+            this.buttonAcceptRule.TabIndex = 13;
+            this.buttonAcceptRule.Text = "V";
+            this.buttonAcceptRule.UseVisualStyleBackColor = true;
             // 
             // groupBoxValueField
             // 
@@ -227,16 +237,6 @@ namespace ClassificatorComplete.Forms
             this.panelOfRules.Name = "panelOfRules";
             this.panelOfRules.Size = new System.Drawing.Size(845, 531);
             this.panelOfRules.TabIndex = 11;
-            // 
-            // buttonAcceptRule
-            // 
-            this.buttonAcceptRule.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAcceptRule.Location = new System.Drawing.Point(806, 15);
-            this.buttonAcceptRule.Name = "buttonAcceptRule";
-            this.buttonAcceptRule.Size = new System.Drawing.Size(27, 25);
-            this.buttonAcceptRule.TabIndex = 13;
-            this.buttonAcceptRule.Text = "V";
-            this.buttonAcceptRule.UseVisualStyleBackColor = true;
             // 
             // ConfigurationForm
             // 

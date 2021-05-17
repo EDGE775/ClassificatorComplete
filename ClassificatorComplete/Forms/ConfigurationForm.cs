@@ -15,13 +15,13 @@ namespace ClassificatorComplete.Forms
     {
         private int rulesCount;
         ClassificatorForm classificatorForm;
-        private List<GroupBox> boxes;
+        private List<GroupBoxRules> boxes;
         public ConfigurationForm(ClassificatorForm classificatorForm)
         {
             InitializeComponent();
             this.classificatorForm = classificatorForm;
-            boxes = new List<GroupBox>();
-            boxes.Add((GroupBox)(panelOfRules.Controls.Find(groupBox.Name, false).First()));
+            boxes = new List<GroupBoxRules>();
+            boxes.Add(new GroupBoxRules(groupBox, new List<GroupBox>() {groupBoxValueField}));
             rulesCount = 1;
         }
 
@@ -32,9 +32,9 @@ namespace ClassificatorComplete.Forms
             GroupBox groupBox = new GroupBox();
             groupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 | System.Windows.Forms.AnchorStyles.Right)));
-            groupBox.Location = new Point(boxes.Last().Location.X, boxes.Last().Location.Y + boxes.Last().Height + 10);
+            groupBox.Location = new Point(boxes.Last().getKey().Location.X, boxes.Last().getKey().Location.Y + boxes.Last().getKey().Height + 10);
             groupBox.Name = "groupBox";
-            groupBox.Size = new System.Drawing.Size(boxes.First().Width, 137);
+            groupBox.Size = new System.Drawing.Size(boxes.First().getKey().Width, 137);
             groupBox.TabIndex = 0;
             groupBox.TabStop = false;
             groupBox.Text = "Правило " + rulesCount;
@@ -44,7 +44,7 @@ namespace ClassificatorComplete.Forms
             Button button = new Button();
             button.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Right)));
-            button.Location = new System.Drawing.Point(boxes.First().Controls.OfType<Button>().Where(x => x.Name.Contains("DeleteRule")).First().Location.X, 19);
+            button.Location = new System.Drawing.Point(boxes.First().getKey().Controls.OfType<Button>().Where(x => x.Name.Contains("DeleteRule")).First().Location.X, 19);
             button.Name = "buttonDeleteRule";
             button.Size = new System.Drawing.Size(27, 112);
             button.TabIndex = 8;
@@ -52,7 +52,7 @@ namespace ClassificatorComplete.Forms
             button.UseVisualStyleBackColor = true;
             button.Click += new EventHandler(buttonDeleteRule_Click);
             groupBox.Controls.Add(button);
-            boxes.Add(groupBox);
+            boxes.Add(new GroupBoxRules(groupBox));
         }
 
         private void ConfigurationForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -69,7 +69,7 @@ namespace ClassificatorComplete.Forms
                 int deletedIndex = -1;
                 for (int i = 0; i < boxes.Count; i++)
                 {
-                    if (boxes[i].Equals(groupBoxForDelete))
+                    if (boxes[i].getKey().Equals(groupBoxForDelete))
                     {
                         deletedIndex = i;
                         break;
@@ -79,7 +79,7 @@ namespace ClassificatorComplete.Forms
                 {
                     for (int i = deletedIndex + 1; i < boxes.Count; i++)
                     {
-                        GroupBox currenBox = boxes[i];
+                        GroupBox currenBox = boxes[i].getKey();
                         int newPointY = currenBox.Location.Y - groupBoxForDelete.Height - 10;
                         currenBox.Location = new Point(currenBox.Location.X, newPointY);
                     }
@@ -94,16 +94,39 @@ namespace ClassificatorComplete.Forms
         private void reOderRulesNumbers()
         {
             int counter = 1;
-            foreach (GroupBox item in boxes)
+            foreach (GroupBoxRules item in boxes)
             {
-                string text = item.Text.Split(' ')[0];
-                item.Text = string.Format("{0} {1}", text, counter++);
+                string text = item.getKey().Text.Split(' ')[0];
+                item.getKey().Text = string.Format("{0} {1}", text, counter++);
             }
         }
 
         private void buttonPlusValueField_Click(object sender, EventArgs e)
         {
+            Button pushedButton = (Button)sender;
+            GroupBox parentKey = (GroupBox) pushedButton.Parent.Parent;
+            List<GroupBox> parentValues = boxes.Where(x => x.getKey().Equals(parentKey)).First().getValues();
 
+            // 
+            // groupBoxValueField
+            // 
+            GroupBox groupBox = new GroupBox();
+            groupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            groupBox.Location = new System.Drawing.Point(parentValues.Last().Location.X, parentValues.Last().Location.Y + parentValues.Last().Height + 5);
+            groupBox.Name = "groupBoxValueField";
+            groupBox.Size = new System.Drawing.Size(parentValues.Last().Width, parentValues.Last().Height);
+            groupBox.TabIndex = 12;
+            groupBox.TabStop = false;
+            groupBox.Text = "Значение параметра " + parentValues.Count;
+
+            parentKey.Controls.Add(groupBox);
+            parentValues.Add(groupBox);
+
+            if (parentKey.Height < parentValues.Sum(x => x.Height + 5))
+            {
+                parentKey.Height = parentKey.Height + groupBox.Height + 5;
+            }
         }
     }
 }

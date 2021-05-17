@@ -102,14 +102,14 @@ namespace ClassificatorComplete
                                     }
                                     catch (Exception)
                                     {
-                                        Print(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения xml файла. Значение не вписано в параметр: \"{1}\".", foundParamName, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                                        Print(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения конфигурационного файла. Значение не вписано в параметр: \"{1}\".", foundParamName, paramName), KPLN_Loader.Preferences.MessageType.Warning);
                                         return rsl;
                                     }
                                 }
                                 else
                                 {
                                     valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue);
-                                    if (valueOfParam == null) return rsl;
+                                    if (valueOfParam == null) valueOfParam = "";
                                 }
                                 foundParamsAndTheirValues.Add(foundParamName, valueOfParam);
                                 break;

@@ -21,7 +21,8 @@ namespace ClassificatorComplete.Forms
         public bool debugMode;
         public int instanceOrType;
         public List<BuiltInCategory> checkedCats;
-        public ConfigurationForm form;
+        public MainWindow form;
+        List<BuiltInCategory> allCats;
 
         public ClassificatorForm(StorageUtils utils)
         {
@@ -33,7 +34,8 @@ namespace ClassificatorComplete.Forms
             checkedCats = new List<BuiltInCategory>();
             if (radioButtonTypeParams.Checked) instanceOrType = 2;
             else if (radioButtonInstanceParams.Checked) instanceOrType = 1;
-            form = new ConfigurationForm(this);
+            buttonOpenConfiguration.Enabled = false;
+            buttonSaveFile.Enabled = false;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -57,7 +59,11 @@ namespace ClassificatorComplete.Forms
         private void buttonChooseFile_Click(object sender, EventArgs e)
         {
             storage = utils.getInfoStorage();
-            checkFileIsCorrect();
+            if (storage != null)
+            {
+                checkFileIsCorrect();
+                setRadioButton();
+            }
         }
 
         private void checkBoxDebug_CheckedChanged(object sender, EventArgs e)
@@ -91,17 +97,17 @@ namespace ClassificatorComplete.Forms
             }
         }
 
-        private void checkFileIsCorrect()
+        private bool checkFileIsCorrect()
         {
             if ((storage.instanceOrType == 1 && instanceOrType == 1) || (storage.instanceOrType == 2 && instanceOrType == 2))
             {
                 textBoxFileInfo.Text = "";
                 textBoxFileInfo.Text += "Выбран конфигурационный файл:" + Environment.NewLine;
                 textBoxFileInfo.Text += Environment.NewLine;
-                textBoxFileInfo.Text += utils.xmlFilePath + Environment.NewLine;
+                textBoxFileInfo.Text += utils.xmlFilePath != null ? utils.xmlFilePath + Environment.NewLine : "Создан новый конфигурационный файл. Файл не сохранён!";
                 textBoxFileInfo.Text += Environment.NewLine;
                 string info = storage.instanceOrType == 1 ? "ЭКЗЕМПЛЯРУ" : storage.instanceOrType == 2 ? "ТИПУ" : "НЕКОРРЕКТНАЯ НАСТРОЙКА КОНФИГУРАЦИОННОГО ФАЙЛА!";
-                textBoxFileInfo.Text += string.Format("Файл содержит {0} правил(о) для заполнения классиифкатора по {1}.", storage.classificator.Count.ToString(), info);
+                textBoxFileInfo.Text += string.Format("Файл содержит {0} правил(о/а/ов) для заполнения классиифкатора по {1}.", storage.classificator.Count.ToString(), info);
                 btnOk.Enabled = true;
 
                 checkedListBox1.Items.Clear();
@@ -109,6 +115,8 @@ namespace ClassificatorComplete.Forms
                 {
                     checkedListBox1.Items.Add(bic, CheckState.Checked);
                 }
+                buttonOpenConfiguration.Enabled = true;
+                return true;
             }
             else
             {
@@ -116,13 +124,81 @@ namespace ClassificatorComplete.Forms
                 textBoxFileInfo.Text = "";
                 textBoxFileInfo.Text += "НЕКОРРЕКТНАЯ НАСТРОЙКА КОНФИГУРАЦИОННОГО ФАЙЛА!";
                 btnOk.Enabled = false;
+                buttonSaveFile.Enabled = false;
+                return false;
+            }
+        }
+
+        private void setRadioButton()
+        {
+            if (storage != null && storage.instanceOrType == 1)
+            {
+                radioButtonInstanceParams.Checked = true;
+            }
+            else if (storage != null && storage.instanceOrType == 2)
+            {
+                radioButtonTypeParams.Checked = true;
             }
         }
 
         private void buttonOpenConfiguration_Click(object sender, EventArgs e)
         {
+            if (allCats == null)
+            {
+                allCats = new List<BuiltInCategory>();
+                foreach (var item in Enum.GetValues(typeof(BuiltInCategory)))
+                {
+                    allCats.Add((BuiltInCategory)item);
+                }
+                allCats.Sort();
+            }
             this.Hide();
+            form = new MainWindow(this, storage, allCats);
             form.ShowDialog();
+        }
+
+        private void ClassificatorForm_VisibleChanged(object sender, EventArgs e)
+        {
+            if (storage != null && storage.instanceOrType != 0)
+            {
+                checkFileIsCorrect();
+                setRadioButton();
+                buttonOpenConfiguration.Enabled = true;
+                buttonSaveFile.Enabled = true;
+            }
+            else
+            {
+                buttonOpenConfiguration.Enabled = false;
+                buttonSaveFile.Enabled = false;
+            }
+        }
+
+        private void buttonCreateNewConfiguration_Click(object sender, EventArgs e)
+        {
+            if (storage != null && storage.instanceOrType != 0 && MessageBox.Show("При создании нового конфигурационного файла, старый будет удалён!", "Внимание!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+            {
+                return;
+            }
+
+            if (allCats == null)
+            {
+                allCats = new List<BuiltInCategory>();
+                foreach (var item in Enum.GetValues(typeof(BuiltInCategory)))
+                {
+                    allCats.Add((BuiltInCategory)item);
+                }
+                allCats.Sort((x, y) => x.ToString().CompareTo(y.ToString()));
+            }
+            this.Hide();
+            storage = new InfosStorage();
+            form = new MainWindow(this, storage, allCats);
+            form.ShowDialog();
+        }
+
+        private void buttonSaveFile_Click(object sender, EventArgs e)
+        {
+            utils.saveInfoStorage(storage);
+            checkFileIsCorrect();
         }
     }
 }
