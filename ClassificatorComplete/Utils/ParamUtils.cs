@@ -28,6 +28,11 @@ namespace ClassificatorComplete
 
             if (index == 1)
             {
+                if (arrayClafiAnd.First().StartsWith("!"))
+                {
+                    return !nameElem.ToLower().Contains(arrayClafiAnd.First().Replace("!",""));
+                }
+
                 if (arrayClafiAnd.First().Contains('|'))
                 {
                     bool check = false;
@@ -49,7 +54,18 @@ namespace ClassificatorComplete
             {
                 for (int i = 0; i < index; i++)
                 {
-                    if (arrayClafiAnd[i].Contains('|'))
+                    if (arrayClafiAnd[i].StartsWith("!"))
+                    {
+                        if (!nameElem.ToLower().Contains(arrayClafiAnd[i].Replace("!", "")))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else if (arrayClafiAnd[i].Contains('|'))
                     {
                         bool check = false;
                         string[] arrayClafiOr = arrayClafiAnd[i].Split('|');

@@ -80,7 +80,7 @@
                                                                     <ColumnDefinition Width="30" />
                                                                     <ColumnDefinition Width="30" />
                                                                 </Grid.ColumnDefinitions>
-                                                                <TextBox Grid.Column="0" Text="{Binding paramValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="15000">
+                                                                <TextBox Grid.Column="0" Text="{Binding paramValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="20000">
                                                                     <TextBox.ToolTip>
                                                                         <ToolTip Background="#FFFFD100" Foreground="Black" HasDropShadow="False" Placement="Relative" HorizontalOffset="15" VerticalOffset="25">
                                                                             <StackPanel>
@@ -116,13 +116,15 @@
                                                 </ComboBox.ToolTip>
                                             </ComboBox>
                                                 <GroupBox Header="{Binding familyNameTextBox, UpdateSourceTrigger=PropertyChanged}"  BorderThickness="0" Foreground="White">
-                                                <TextBox Text="{Binding familyNameValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="15000">
+                                                <TextBox Text="{Binding familyNameValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="20000">
                                                     <TextBox.ToolTip>
                                                         <ToolTip Background="#FFFFD100" Foreground="Black" HasDropShadow="False" Placement="Relative" HorizontalOffset="15" VerticalOffset="25" >
                                                             <StackPanel>
-                                                                <TextBlock>В поле можно использовать условия И (",") и ИЛИ ("|"), например строка:</TextBlock>
+                                                                <TextBlock>В поле возможно использовать условия И (",") ИЛИ ("|") НЕ ("!"), например:</TextBlock>
                                                                 <TextBlock Foreground="Red">00,стена|пилон,внешний</TextBlock>
-                                                                <TextBlock>означает, что в названии должно содержаться "00" И ("стена" ИЛИ "пилон") И "внешний"</TextBlock>
+                                                                <TextBlock>означает, что в названии должно содержаться "00" И ("стена" ИЛИ "пилон") И "внешний". Или:</TextBlock>
+                                                                <TextBlock Foreground="Red">00,плита,!покрытие,!площадка</TextBlock>
+                                                                <TextBlock>означает, что в названии должно содержаться "00" И "плита" И НЕ "покрытие" И НЕ "площадка".</TextBlock>
                                                                 <TextBlock>Если в найденном семействе выполнены все эти условия, оно будет обработано плагином</TextBlock>
                                                                 <TextBlock>Регистр букв значения не имеет</TextBlock>
                                                             </StackPanel>
@@ -131,13 +133,15 @@
                                                 </TextBox>
                                             </GroupBox>
                                             <GroupBox Header="{Binding typeNameTextBox, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Foreground="White">
-                                                <TextBox Text="{Binding typeNameValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="15000">
+                                                <TextBox Text="{Binding typeNameValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="1000" ToolTipService.ShowDuration="20000">
                                                     <TextBox.ToolTip>
                                                         <ToolTip Background="#FFFFD100" Foreground="Black" HasDropShadow="False" Placement="Relative" HorizontalOffset="15" VerticalOffset="25" >
                                                             <StackPanel>
-                                                                <TextBlock>В поле можно использовать условия И (",") и ИЛИ ("|"), например строка:</TextBlock>
+                                                                <TextBlock>В поле возможно использовать условия И (",") ИЛИ ("|") НЕ ("!"), например:</TextBlock>
                                                                 <TextBlock Foreground="Red">00,стена|пилон,внешний</TextBlock>
-                                                                <TextBlock>означает, что в названии должно содержаться "00" И ("стена" ИЛИ "пилон") И "внешний"</TextBlock>
+                                                                <TextBlock>означает, что в названии должно содержаться "00" И ("стена" ИЛИ "пилон") И "внешний". Или:</TextBlock>
+                                                                <TextBlock Foreground="Red">00,плита,!покрытие,!площадка</TextBlock>
+                                                                <TextBlock>означает, что в названии должно содержаться "00" И "плита" И НЕ "покрытие" И НЕ "площадка".</TextBlock>
                                                                 <TextBlock>Если в найденном семействе выполнены все эти условия, оно будет обработано плагином</TextBlock>
                                                                 <TextBlock>Регистр букв значения не имеет</TextBlock>
                                                             </StackPanel>

@@ -91,8 +91,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="CommandOpenClassificatorForm.cs" />
     <Compile Include="Data\Classificator.cs" />
-    <Compile Include="Command.cs" />
+    <Compile Include="CommandStartClassificator.cs" />
     <Compile Include="Data\InfosStorage.cs" />
     <Compile Include="Data\UtilsStorage.cs" />
     <Compile Include="Forms\ClassificatorForm.cs">

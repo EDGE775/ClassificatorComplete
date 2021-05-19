@@ -16,7 +16,7 @@ using ClassificatorComplete.Forms;
 namespace ClassificatorComplete
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class Command : IExternalCommand
+    class CommandStartClassificator : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {

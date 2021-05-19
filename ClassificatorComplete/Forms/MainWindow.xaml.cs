@@ -48,7 +48,7 @@ namespace ClassificatorComplete.Forms
                 this.storage.classificator = new List<Classificator>();
                 this.storage.instanseParams = new List<string>();
                 RuleItem firstRuleItem = new RuleItem("", "", BuiltInCategory.INVALID);
-                firstRuleItem.addValueOfParam("Пустое значение параметра");
+                firstRuleItem.addValueOfParam("");
                 ruleItems.Add(firstRuleItem);
                 settings.addParamName("Введите имя параметра");
             }

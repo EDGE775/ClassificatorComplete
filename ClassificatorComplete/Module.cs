@@ -34,11 +34,17 @@ namespace ClassificatorComplete
                 "ClassificatorCompleteCommand",
                 "Заполнить\nклассификатор",
                 assemblyPath,
-                "ClassificatorComplete.Command");
+                "ClassificatorComplete.CommandStartClassificator");
 
             btnHostMark.LargeImage = PngImageSource("ClassificatorComplete.Resources.Classificator_large.PNG");
             btnHostMark.Image = PngImageSource("ClassificatorComplete.Resources.Classificator.PNG");
-            btnHostMark.ToolTip = "Заполняет классификатор согласно выбранному XML файлу";
+            btnHostMark.ToolTip = "Параметризация элементов согласно заданным правилам.";
+            btnHostMark.LongDescription = "Возможности:\n" +
+                "Задание правил для параметризации элементов;\n" +
+                "Маппинг параметров (передача значений между параметрами элемента);\n" +
+                "Сохранение конфигурационного файла с возможностью повторного использования;\n";
+            btnHostMark.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, @"https://yandex.ru/"));
+
             panel.AddItem(btnHostMark);
 
             return Result.Succeeded;
