@@ -34,14 +34,6 @@ namespace ClassificatorComplete.Forms.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public string paramNumberText
-        {
-            get
-            {
-                return "Параметр " + _paramNumber;
-            }
-        }
-
         public ParamNameItem(string paramName)
         {
             this.paramName = paramName;

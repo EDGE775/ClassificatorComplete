@@ -1,10 +1,12 @@
 ﻿using ClassificatorComplete.Forms.ViewModels;
+using ClassificatorComplete.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BuiltInCategory = Autodesk.Revit.DB.BuiltInCategory;
+using static KPLN_Loader.Output.Output;
 
 
 namespace ClassificatorComplete.Forms
@@ -28,10 +31,10 @@ namespace ClassificatorComplete.Forms
         public ObservableCollection<RuleItem> ruleItems { get; set; }
         public ClassificatorForm classificatorForm { get; set; }
         public Settings settings { get; set; }
-        public InfosStorage storage;
+        public InfosStorage storage { get; set; }
         private bool checkedExit { get; set; }
 
-        public MainWindow(ClassificatorForm classificatorForm, InfosStorage storage, List<BuiltInCategory> allCats )
+        public MainWindow(ClassificatorForm classificatorForm, InfosStorage storage, List<BuiltInCategory> allCats)
         {
             InitializeComponent();
             this.classificatorForm = classificatorForm;
@@ -69,7 +72,7 @@ namespace ClassificatorComplete.Forms
                     {
                         ruleItem.addValueOfParam(pv);
                     }
-                    ruleItem.colourOfRule = "#4C87B3";
+                    ruleItem.colourOfRule = BackGroundColour.OLD_RULE;
                     ruleItems.Add(ruleItem);
                 }
                 foreach (var item in storage.instanseParams)
@@ -77,7 +80,7 @@ namespace ClassificatorComplete.Forms
                     settings.addParamName(item);
                 }
             }
-
+            findDoubledRules();
             refreshNumbersOfRules(ruleItems);
         }
 
@@ -104,16 +107,46 @@ namespace ClassificatorComplete.Forms
             {
                 ruleItems.Remove(ruleItem);
                 refreshNumbersOfRules(ruleItems);
-                CollectionViewSource.GetDefaultView(ruleItems).Refresh();
             }
+        }
+
+        private void FindElementsByRule_Click(object sender, RoutedEventArgs e)
+        {
+            Button bt = (Button)sender;
+            RuleItem ruleItem = bt.DataContext as RuleItem;
+            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItem));
         }
 
         private void Add_Rule_Click(object sender, RoutedEventArgs e)
         {
             ruleItems.Add(new RuleItem("", "", BuiltInCategory.INVALID));
-            ruleItems.Last().addValueOfParam("Пустое значение параметра");
+            ruleItems.Last().addValueOfParam("");
             refreshNumbersOfRules(ruleItems);
-            CollectionViewSource.GetDefaultView(ruleItems).Refresh();
+        }
+
+        private void Get_Rule_Click(object sender, RoutedEventArgs e)
+        {
+            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandGetElementInfo(this));
+        }
+
+        public bool setRuleFromElement(BuiltInCategory builtInCategory, string familyName, string typeName, List<string> paramValues)
+        {
+            if (ruleItems.Count == 1 && ruleItems.First().builtInCategoryName.Equals(BuiltInCategory.INVALID))
+            {
+                ruleItems.RemoveAt(0);
+            }
+            RuleItem newRule = new RuleItem(familyName, typeName, builtInCategory);
+            if (!ruleItems.Contains(newRule))
+            {
+                ruleItems.Add(newRule);
+                foreach (string item in paramValues)
+                {
+                    ruleItems.Last().addValueOfParam(item);
+                }
+                refreshNumbersOfRules(ruleItems);
+                return true;
+            }
+            return false;
         }
 
         private void Add_Value_Click(object sender, RoutedEventArgs e)
@@ -122,8 +155,7 @@ namespace ClassificatorComplete.Forms
             ParamValueItem valueItem = bt.DataContext as ParamValueItem;
             RuleItem ruleItem = valueItem.parent;
             int index = ruleItem.valuesOfParams.IndexOf(valueItem);
-            ruleItem.addValueOfParamByIndex("Пустое значение параметра", index + 1);
-            CollectionViewSource.GetDefaultView(ruleItem.valuesOfParams).Refresh();
+            ruleItem.addValueOfParamByIndex("", index + 1);
         }
 
         private void Delete_Value_Click(object sender, RoutedEventArgs e)
@@ -134,7 +166,6 @@ namespace ClassificatorComplete.Forms
             if (ruleItem.valuesOfParams.Count != 1)
             {
                 ruleItem.removeValueOfParam(valueItem);
-                CollectionViewSource.GetDefaultView(ruleItem.valuesOfParams).Refresh();
             }
         }
 
@@ -144,7 +175,6 @@ namespace ClassificatorComplete.Forms
             ParamNameItem paramItem = bt.DataContext as ParamNameItem;
             int index = settings.paramNameItems.IndexOf(paramItem);
             settings.addParamNameByIndex("Введите имя параметра", index + 1);
-            CollectionViewSource.GetDefaultView(settings.paramNameItems).Refresh();
         }
 
         private void Delete_ParamName_Click(object sender, RoutedEventArgs e)
@@ -154,7 +184,25 @@ namespace ClassificatorComplete.Forms
             if (settings.paramNameItems.Count != 1)
             {
                 settings.removeParamName(paramNameItem);
-                CollectionViewSource.GetDefaultView(settings.paramNameItems).Refresh();
+            }
+        }
+
+        private void Choose_ParamName_Click(object sender, RoutedEventArgs e)
+        {
+            Button bt = (Button)sender;
+            ParamNameItem paramItem = bt.DataContext as ParamNameItem;
+            ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, paramItem);
+            parameterSelectorForm.ShowDialog();
+        }
+
+        private void Insert_ParamName_Click(object sender, RoutedEventArgs e)
+        {
+            Button bt = (Button)sender;
+            ParamValueItem valueItem = bt.DataContext as ParamValueItem;
+            if (valueItem.paramValue.Contains("[]"))
+            {
+                ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, valueItem);
+                parameterSelectorForm.ShowDialog();
             }
         }
 
@@ -162,7 +210,6 @@ namespace ClassificatorComplete.Forms
         {
             RadioButton pressed = (RadioButton)sender;
             settings.instanceOrType = pressed.Content.ToString().Contains("экземпляр") ? 1 : 2;
-
         }
 
         private static void refreshNumbersOfRules(ObservableCollection<RuleItem> ruleItems)
@@ -179,6 +226,13 @@ namespace ClassificatorComplete.Forms
             {
                 MessageBox.Show("Выберите тип заполнения классификатора - по типу или по экземпляру.", "Некорректные данные!");
                 return;
+            }
+            if (findDoubledRules())
+            {
+                if(MessageBox.Show("В файле присутствуют дублирующие друг друга правила! Они подкрашены серым цветом.", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                {
+                    return;
+                }
             }
 
             storage.instanceOrType = settings.instanceOrType;
@@ -197,6 +251,63 @@ namespace ClassificatorComplete.Forms
             checkedExit = false;
             this.Close();
             classificatorForm.Show();
+        }
+
+        private void Sort_Classificator_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<RuleItem> sortedCollection = new ObservableCollection<RuleItem>();
+            foreach (var elem in ruleItems
+                .OrderBy(x => x.builtInCategoryName.ToString())
+                .ThenBy(x => x.familyNameValue)
+                .ThenBy(x => x.typeNameValue))
+            {
+                sortedCollection.Add(elem);
+            }
+            ruleItems = sortedCollection;
+            this.Collection.ItemsSource = ruleItems;
+            refreshNumbersOfRules(ruleItems);
+            findDoubledRules();
+        }
+
+        public bool findDoubledRules()
+        {
+            HashSet<RuleItem> doubledItems = new HashSet<RuleItem>();
+            for (int i = 0; i < ruleItems.Count; i++)
+            {
+                RuleItem firstItem = ruleItems[i];
+                List<RuleItem> itemsForLoop = new List<RuleItem>(ruleItems);
+                itemsForLoop.RemoveAt(i);
+                for (int j = 0; j < itemsForLoop.Count; j++)
+                {
+                    RuleItem secondItem = itemsForLoop[j];
+                    if (secondItem.Equals(firstItem))
+                    {
+                        doubledItems.Add(firstItem);
+                        doubledItems.Add(secondItem);
+                        continue;
+                    }
+                    if (firstItem.builtInCategoryName.Equals(secondItem.builtInCategoryName)
+                        && ParamUtils.nameChecker(firstItem.familyNameValue, secondItem.familyNameValue)
+                        && ParamUtils.nameChecker(firstItem.typeNameValue, secondItem.typeNameValue))
+                    {
+                        doubledItems.Add(firstItem);
+                        doubledItems.Add(secondItem);
+                        continue;
+                    }
+                }
+            }
+            foreach (var item in doubledItems)
+            {
+                item.colourOfRule = BackGroundColour.DOUBLED_RULE;
+            }
+            foreach (var item in ruleItems)
+            {
+                if (!doubledItems.Contains(item) && item.colourOfRule.Equals(BackGroundColour.DOUBLED_RULE))
+                {
+                    item.colourOfRule = BackGroundColour.NEW_RULE;
+                }
+            }
+            return doubledItems.Count == 0 ? false : true;
         }
     }
 }

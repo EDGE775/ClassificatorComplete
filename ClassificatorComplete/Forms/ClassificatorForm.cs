@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using ElementId = Autodesk.Revit.DB.ElementId;
 using Category = Autodesk.Revit.DB.Category;
 using BuiltInCategory = Autodesk.Revit.DB.BuiltInCategory;
-
+using ClassificatorComplete.Utils;
 
 namespace ClassificatorComplete.Forms
 {
@@ -22,9 +22,10 @@ namespace ClassificatorComplete.Forms
         public int instanceOrType;
         public List<BuiltInCategory> checkedCats;
         public MainWindow form;
-        List<BuiltInCategory> allCats;
+        public List<BuiltInCategory> allCats;
+        public List<MyParameter> mparams;
 
-        public ClassificatorForm(StorageUtils utils)
+        public ClassificatorForm(StorageUtils utils, List<MyParameter> mparams)
         {
             InitializeComponent();
             this.utils = utils;
@@ -36,6 +37,7 @@ namespace ClassificatorComplete.Forms
             else if (radioButtonInstanceParams.Checked) instanceOrType = 1;
             buttonOpenConfiguration.Enabled = false;
             buttonSaveFile.Enabled = false;
+            this.mparams = mparams;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -46,8 +48,10 @@ namespace ClassificatorComplete.Forms
                 checkedCats.Add(cat);
             }
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            //this.DialogResult = DialogResult.OK;
+            //this.Close();
+
+            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandStartClassificator(this));
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -154,7 +158,7 @@ namespace ClassificatorComplete.Forms
             }
             this.Hide();
             form = new MainWindow(this, storage, allCats);
-            form.ShowDialog();
+            form.Show();
         }
 
         private void ClassificatorForm_VisibleChanged(object sender, EventArgs e)
@@ -192,7 +196,7 @@ namespace ClassificatorComplete.Forms
             this.Hide();
             storage = new InfosStorage();
             form = new MainWindow(this, storage, allCats);
-            form.ShowDialog();
+            form.Show();
         }
 
         private void buttonSaveFile_Click(object sender, EventArgs e)

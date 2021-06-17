@@ -34,7 +34,7 @@ namespace ClassificatorComplete
                 "ClassificatorCompleteCommand",
                 "Заполнить\nклассификатор",
                 assemblyPath,
-                "ClassificatorComplete.CommandStartClassificator");
+                "ClassificatorComplete.CommandOpenClassificatorForm");
 
             btnHostMark.LargeImage = PngImageSource("ClassificatorComplete.Resources.Classificator_large.PNG");
             btnHostMark.Image = PngImageSource("ClassificatorComplete.Resources.Classificator.PNG");

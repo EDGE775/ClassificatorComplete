@@ -212,6 +212,7 @@ namespace ClassificatorComplete.Forms
             this.Name = "ClassificatorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Классификация";
+            this.TopMost = true;
             this.VisibleChanged += new System.EventHandler(this.ClassificatorForm_VisibleChanged);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

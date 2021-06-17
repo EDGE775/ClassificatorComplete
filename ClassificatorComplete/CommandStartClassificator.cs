@@ -12,23 +12,23 @@ using static KPLN_Loader.Output.Output;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
 using ClassificatorComplete.Forms;
+using KPLN_Loader.Common;
 
 namespace ClassificatorComplete
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class CommandStartClassificator : IExternalCommand
+    class CommandStartClassificator : IExecutableCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        private ClassificatorForm form { get; set; }
+
+        public CommandStartClassificator(ClassificatorForm form)
         {
-            Document doc = commandData.Application.ActiveUIDocument.Document;
-            Selection sel = commandData.Application.ActiveUIDocument.Selection;
+            this.form = form;
+        }
+        public Result Execute(UIApplication app)
+        {
+            Document doc = app.ActiveUIDocument.Document;
+            Selection sel = app.ActiveUIDocument.Selection;
             View activeView = doc.ActiveView;
-
-            StorageUtils utils = new StorageUtils();
-
-            ClassificatorForm form = new ClassificatorForm(utils);
-            form.ShowDialog();
-            if (form.DialogResult != System.Windows.Forms.DialogResult.OK) return Result.Cancelled;
 
             bool debugMode = form.debugMode;
 

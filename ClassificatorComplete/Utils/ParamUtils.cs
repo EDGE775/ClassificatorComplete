@@ -21,7 +21,7 @@ namespace ClassificatorComplete
             this.debugMode = debugMode;
         }
 
-        private bool nameChecker(string nameClafi, string nameElem)
+        public static bool nameChecker(string nameClafi, string nameElem)
         {
             string[] arrayClafiAnd = nameClafi.ToLower().Split(',');
             int index = arrayClafiAnd.Length;
@@ -30,7 +30,7 @@ namespace ClassificatorComplete
             {
                 if (arrayClafiAnd.First().StartsWith("!"))
                 {
-                    return !nameElem.ToLower().Contains(arrayClafiAnd.First().Replace("!",""));
+                    return !nameElem.ToLower().Contains(arrayClafiAnd.First().Replace("!","")) && !nameElem.Contains("!");
                 }
 
                 if (arrayClafiAnd.First().Contains('|'))
@@ -56,7 +56,7 @@ namespace ClassificatorComplete
                 {
                     if (arrayClafiAnd[i].StartsWith("!"))
                     {
-                        if (!nameElem.ToLower().Contains(arrayClafiAnd[i].Replace("!", "")))
+                        if (!nameElem.ToLower().Contains(arrayClafiAnd[i].Replace("!", "")) && !nameElem.Contains("!"))
                         {
                             continue;
                         }
@@ -153,9 +153,8 @@ namespace ClassificatorComplete
             }
             catch (Exception)
             {
-                Print("Не удалось назначить параметр: " + paramName, KPLN_Loader.Preferences.MessageType.Warning);
+                Print(string.Format("Не удалось назначить параметр: \"{0}\" элементу: {1} с id: {2}", paramName, elem.Name, elem.Id), KPLN_Loader.Preferences.MessageType.Warning);
             }
-
             return rsl;
         }
 
@@ -206,7 +205,7 @@ namespace ClassificatorComplete
             }
         }
 
-        private static string getValueStringOfAllParams(Element elem, string paramName)
+        public static string getValueStringOfAllParams(Element elem, string paramName)
         {
             string paramValue = null;
             Parameter paramObject = elem.LookupParameter(paramName);
@@ -275,20 +274,7 @@ namespace ClassificatorComplete
 
             foreach (Element elem in constrs)
             {
-                string familyName = null;
-                if (elem is Room)
-                {
-                    familyName = elem.get_Parameter(BuiltInParameter.ROOM_DEPARTMENT).AsString();
-                }
-                else
-                {
-                    try
-                    {
-                        familyName = elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString();
-                    }
-                    catch (Exception) { }
-                    familyName = familyName == null || familyName.Length == 0 ? (elem as ElementType).FamilyName : familyName;
-                }
+                string familyName = getElemFamilyName(elem);
 
                 PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), KPLN_Loader.Preferences.MessageType.System_Regular, debugMode);
                 foreach (Classificator classificator in storage.classificator)
@@ -330,6 +316,25 @@ namespace ClassificatorComplete
                 }
             }
             return true;
+        }
+
+        public static string getElemFamilyName(Element elem)
+        {
+            string familyName = null;
+            if (elem is Room)
+            {
+                familyName = elem.get_Parameter(BuiltInParameter.ROOM_DEPARTMENT).AsString();
+            }
+            else
+            {
+                try
+                {
+                    familyName = elem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString();
+                }
+                catch (Exception) { }
+                familyName = familyName == null || familyName.Length == 0 ? (elem as ElementType).FamilyName : familyName;
+            }
+            return familyName;
         }
     }
 }

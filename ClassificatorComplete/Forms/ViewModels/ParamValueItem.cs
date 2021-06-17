@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClassificatorComplete.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,20 @@ namespace ClassificatorComplete.Forms.ViewModels
 {
     public class ParamValueItem : BaseViewModel
     {
-        public string _paramValue { get; set; }
+        private string _colourOfValueBack { get; set; }
+        public string colourOfValueBack
+        {
+            get
+            {
+                return _colourOfValueBack;
+            }
+            set
+            {
+                _colourOfValueBack = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private string _paramValue { get; set; }
         public string paramValue
         {
             get
@@ -21,7 +35,15 @@ namespace ClassificatorComplete.Forms.ViewModels
                 NotifyPropertyChanged();
                 if (parent != null)
                 {
-                    parent.colourOfRule = "#ff6900";
+                    parent.colourOfRule = BackGroundColour.NEW_RULE;
+                }
+                if (_paramValue != null && !isParamValueCorrect(_paramValue))
+                {
+                    colourOfValueBack = BackGroundColour.WRONG_VALUE;
+                }
+                else
+                {
+                    colourOfValueBack = BackGroundColour.CORRECT_VALUE;
                 }
             }
         }
@@ -39,24 +61,39 @@ namespace ClassificatorComplete.Forms.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public string valueNumberText
-        {
-            get
-            {
-                return "Значение параметра " + _valueNumber;
-            }
-        }
 
         public ParamValueItem(string paramValue, RuleItem parent)
         {
             this.paramValue = paramValue;
             this.parent = parent;
+            this.colourOfValueBack = BackGroundColour.CORRECT_VALUE;
         }
 
         public override bool Equals(object obj)
         {
             return obj is ParamValueItem item &&
                    paramValue == item.paramValue;
+        }
+
+        private bool isParamValueCorrect(string paramValue)
+        {
+            Stack<char> stack = new Stack<char>();
+            foreach (var item in paramValue.ToCharArray())
+            {
+                if (item == '[')
+                {
+                    stack.Push(item);
+                }
+                else if (item == ']' && stack.Count != 0 && stack.Peek() == '[')
+                {
+                    stack.Pop();
+                }
+                else if (item == ']')
+                {
+                    stack.Push(item);
+                }
+            }
+            return stack.Count == 0;
         }
 
         public override int GetHashCode()

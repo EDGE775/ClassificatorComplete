@@ -32,13 +32,13 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2018|AnyCPU'">
-    <OutputPath>..\..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\CLASSC2018\</OutputPath>
+    <OutputPath>..\..\..\..\03_Скрипты\09_Модули_KPLN_Loader\Common\CLASSC2018\</OutputPath>
     <DefineConstants>Revit2018</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Revit2020|AnyCPU'">
-    <OutputPath>..\..\..\..\03_Скрипты\09_Модули_KPLN_Loader\BIM\CLASSC2020\</OutputPath>
+    <OutputPath>..\..\..\..\03_Скрипты\09_Модули_KPLN_Loader\Common\CLASSC2020\</OutputPath>
     <DefineConstants>Revit2020</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
     <Optimize>true</Optimize>
@@ -91,6 +91,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="CommandFindElementsInModel.cs" />
+    <Compile Include="CommandGetElementInfo.cs" />
     <Compile Include="CommandOpenClassificatorForm.cs" />
     <Compile Include="Data\Classificator.cs" />
     <Compile Include="CommandStartClassificator.cs" />
@@ -102,16 +104,12 @@
     <Compile Include="Forms\ClassificatorForm.Designer.cs">
       <DependentUpon>ClassificatorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ConfigurationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ConfigurationForm.Designer.cs">
-      <DependentUpon>ConfigurationForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\GroupBoxRules.cs" />
+    <Compile Include="Forms\ParameterSelectorForm.xaml.cs">
+      <DependentUpon>ParameterSelectorForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ViewModels\BaseViewModel.cs" />
     <Compile Include="Forms\ViewModels\ParamNameItem.cs" />
     <Compile Include="Forms\ViewModels\ParamValueItem.cs" />
@@ -119,17 +117,16 @@
     <Compile Include="Forms\ViewModels\Settings.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Output\OutputDebug.cs" />
+    <Compile Include="Utils\MyParameter.cs" />
     <Compile Include="Utils\ParamUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\BackGroundColour.cs" />
     <Compile Include="Utils\StorageUtils.cs" />
     <Compile Include="Utils\ViewUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\ClassificatorForm.resx">
       <DependentUpon>ClassificatorForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ConfigurationForm.resx">
-      <DependentUpon>ConfigurationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Classificator.PNG" />
     <EmbeddedResource Include="Resources\Classificator_large.PNG" />
@@ -140,6 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Forms\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\ParameterSelectorForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
