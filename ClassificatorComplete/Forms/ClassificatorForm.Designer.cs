@@ -48,7 +48,7 @@ namespace ClassificatorComplete.Forms
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancel.Location = new System.Drawing.Point(12, 430);
+            this.btnCancel.Location = new System.Drawing.Point(12, 470);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -59,7 +59,7 @@ namespace ClassificatorComplete.Forms
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(171, 430);
+            this.btnOk.Location = new System.Drawing.Point(231, 470);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(141, 23);
             this.btnOk.TabIndex = 2;
@@ -71,33 +71,35 @@ namespace ClassificatorComplete.Forms
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 261);
+            this.label1.Location = new System.Drawing.Point(9, 301);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(219, 13);
+            this.label1.Size = new System.Drawing.Size(373, 13);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Выберите категории для классификации:";
+            this.label1.Text = "Выберите категории для классификации (для опытных пользователей):";
             // 
             // radioButtonInstanceParams
             // 
             this.radioButtonInstanceParams.AutoSize = true;
             this.radioButtonInstanceParams.Checked = true;
+            this.radioButtonInstanceParams.Enabled = false;
             this.radioButtonInstanceParams.Location = new System.Drawing.Point(6, 42);
             this.radioButtonInstanceParams.Name = "radioButtonInstanceParams";
-            this.radioButtonInstanceParams.Size = new System.Drawing.Size(158, 17);
+            this.radioButtonInstanceParams.Size = new System.Drawing.Size(153, 17);
             this.radioButtonInstanceParams.TabIndex = 4;
             this.radioButtonInstanceParams.TabStop = true;
-            this.radioButtonInstanceParams.Text = "Заполнить по экземпляру";
+            this.radioButtonInstanceParams.Text = "Заполние по экземпляру";
             this.radioButtonInstanceParams.UseVisualStyleBackColor = true;
             this.radioButtonInstanceParams.CheckedChanged += new System.EventHandler(this.radioButtonInstanceParams_CheckedChanged);
             // 
             // radioButtonTypeParams
             // 
             this.radioButtonTypeParams.AutoSize = true;
+            this.radioButtonTypeParams.Enabled = false;
             this.radioButtonTypeParams.Location = new System.Drawing.Point(6, 19);
             this.radioButtonTypeParams.Name = "radioButtonTypeParams";
-            this.radioButtonTypeParams.Size = new System.Drawing.Size(119, 17);
+            this.radioButtonTypeParams.Size = new System.Drawing.Size(114, 17);
             this.radioButtonTypeParams.TabIndex = 5;
-            this.radioButtonTypeParams.Text = "Заполнить по типу";
+            this.radioButtonTypeParams.Text = "Заполние по типу";
             this.radioButtonTypeParams.UseVisualStyleBackColor = true;
             this.radioButtonTypeParams.CheckedChanged += new System.EventHandler(this.radioButtonTypeParams_CheckedChanged);
             // 
@@ -109,7 +111,7 @@ namespace ClassificatorComplete.Forms
             this.groupBox1.Controls.Add(this.radioButtonInstanceParams);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(208, 71);
+            this.groupBox1.Size = new System.Drawing.Size(268, 71);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Алгоритм";
@@ -145,7 +147,7 @@ namespace ClassificatorComplete.Forms
             this.textBoxFileInfo.Name = "textBoxFileInfo";
             this.textBoxFileInfo.ReadOnly = true;
             this.textBoxFileInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxFileInfo.Size = new System.Drawing.Size(300, 112);
+            this.textBoxFileInfo.Size = new System.Drawing.Size(360, 152);
             this.textBoxFileInfo.TabIndex = 9;
             // 
             // checkedListBox1
@@ -154,15 +156,15 @@ namespace ClassificatorComplete.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.checkedListBox1.CheckOnClick = true;
             this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(12, 277);
+            this.checkedListBox1.Location = new System.Drawing.Point(12, 317);
             this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(300, 139);
+            this.checkedListBox1.Size = new System.Drawing.Size(360, 139);
             this.checkedListBox1.TabIndex = 10;
             // 
             // buttonOpenConfiguration
             // 
             this.buttonOpenConfiguration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOpenConfiguration.Location = new System.Drawing.Point(226, 20);
+            this.buttonOpenConfiguration.Location = new System.Drawing.Point(286, 20);
             this.buttonOpenConfiguration.Name = "buttonOpenConfiguration";
             this.buttonOpenConfiguration.Size = new System.Drawing.Size(86, 28);
             this.buttonOpenConfiguration.TabIndex = 11;
@@ -173,7 +175,7 @@ namespace ClassificatorComplete.Forms
             // buttonCreateNewConfiguration
             // 
             this.buttonCreateNewConfiguration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCreateNewConfiguration.Location = new System.Drawing.Point(226, 55);
+            this.buttonCreateNewConfiguration.Location = new System.Drawing.Point(286, 55);
             this.buttonCreateNewConfiguration.Name = "buttonCreateNewConfiguration";
             this.buttonCreateNewConfiguration.Size = new System.Drawing.Size(86, 28);
             this.buttonCreateNewConfiguration.TabIndex = 12;
@@ -184,7 +186,7 @@ namespace ClassificatorComplete.Forms
             // buttonSaveFile
             // 
             this.buttonSaveFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSaveFile.Location = new System.Drawing.Point(201, 117);
+            this.buttonSaveFile.Location = new System.Drawing.Point(261, 117);
             this.buttonSaveFile.Name = "buttonSaveFile";
             this.buttonSaveFile.Size = new System.Drawing.Size(111, 23);
             this.buttonSaveFile.TabIndex = 13;
@@ -196,7 +198,7 @@ namespace ClassificatorComplete.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(324, 462);
+            this.ClientSize = new System.Drawing.Size(384, 502);
             this.Controls.Add(this.buttonSaveFile);
             this.Controls.Add(this.buttonCreateNewConfiguration);
             this.Controls.Add(this.buttonOpenConfiguration);
@@ -208,7 +210,7 @@ namespace ClassificatorComplete.Forms
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnCancel);
-            this.MinimumSize = new System.Drawing.Size(340, 500);
+            this.MinimumSize = new System.Drawing.Size(400, 540);
             this.Name = "ClassificatorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Классификация";

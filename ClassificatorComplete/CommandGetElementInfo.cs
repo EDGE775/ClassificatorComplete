@@ -83,7 +83,11 @@ namespace ClassificatorComplete
                     }
                 }
 
-                if (form.setRuleFromElement(builtInCategory, familyName, typeName, paramValues)) counter++;
+                if (form.setRuleFromElement(builtInCategory, familyName, typeName, paramValues))
+                {
+                    form.ruleItems.Last().elemsCountInModel = CommandFindElementsInModel.getElemsFromModel(doc, form.ruleItems.Last()).Count;
+                    counter++;
+                }
             }
             form.findDoubledRules();
             MessageBox.Show(string.Format("Добавлено правил: {0}", counter), "Внимание!", MessageBoxButtons.OK, MessageBoxIcon.Information);

@@ -90,7 +90,7 @@ namespace ClassificatorComplete
                     ParamUtils utilsForInstanse = new ParamUtils(debugMode);
                     utilsForInstanse.startClassification(constrsInstances, storage, doc);
 
-                    if (activeView.Name.Contains("3D"))
+                    if (activeView.ViewType == ViewType.ThreeD)
                     {
                         ViewUtils viewUtils = new ViewUtils(doc);
 
@@ -128,7 +128,11 @@ namespace ClassificatorComplete
                             catch { }
                         }
                     }
-                    Print(string.Format("Обработано элементов: {0}", utilsForInstanse.fullSuccessElems.Count + utilsForInstanse.notFullSuccessElems.Count), KPLN_Loader.Preferences.MessageType.Success);
+                    Print(string.Format("Обработано элементов: {0}", 
+                        utilsForInstanse.fullSuccessElems.Count + utilsForInstanse.notFullSuccessElems.Count), 
+                        KPLN_Loader.Preferences.MessageType.Success);
+
+                    LastRunInfo.getInstance().save(form.utils.xmlFilePath);
                 }
                 else
                 {

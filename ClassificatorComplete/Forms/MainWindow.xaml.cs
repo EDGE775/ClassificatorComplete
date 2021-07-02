@@ -19,7 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BuiltInCategory = Autodesk.Revit.DB.BuiltInCategory;
 using static KPLN_Loader.Output.Output;
-
+using System.Windows.Interop;
 
 namespace ClassificatorComplete.Forms
 {
@@ -36,6 +36,13 @@ namespace ClassificatorComplete.Forms
 
         public MainWindow(ClassificatorForm classificatorForm, InfosStorage storage, List<BuiltInCategory> allCats)
         {
+#if Revit2020
+            Owner = ModuleData.RevitWindow;
+#endif
+#if Revit2018
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            helper.Owner = ModuleData.MainWindowHandle;
+#endif
             InitializeComponent();
             this.classificatorForm = classificatorForm;
             this.storage = storage;
@@ -72,7 +79,7 @@ namespace ClassificatorComplete.Forms
                     {
                         ruleItem.addValueOfParam(pv);
                     }
-                    ruleItem.colourOfRule = BackGroundColour.OLD_RULE;
+                    ruleItem.colourOfRule = ColourUtils.OLD_RULE;
                     ruleItems.Add(ruleItem);
                 }
                 foreach (var item in storage.instanseParams)
@@ -82,6 +89,10 @@ namespace ClassificatorComplete.Forms
             }
             findDoubledRules();
             refreshNumbersOfRules(ruleItems);
+            if (ModuleData.isDocumentAvailable)
+            {
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindAllElementsInModel(ruleItems));
+            }
         }
 
         public void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -112,9 +123,16 @@ namespace ClassificatorComplete.Forms
 
         private void FindElementsByRule_Click(object sender, RoutedEventArgs e)
         {
-            Button bt = (Button)sender;
-            RuleItem ruleItem = bt.DataContext as RuleItem;
-            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItem));
+            if (ModuleData.isDocumentAvailable)
+            {
+                Button bt = (Button)sender;
+                RuleItem ruleItem = bt.DataContext as RuleItem;
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItem));
+            }
+            else
+            {
+                MessageBox.Show("Ни один документ не открыт. Получение информации об элементах невозможна.", "Ошибка!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            }
         }
 
         private void Add_Rule_Click(object sender, RoutedEventArgs e)
@@ -126,7 +144,14 @@ namespace ClassificatorComplete.Forms
 
         private void Get_Rule_Click(object sender, RoutedEventArgs e)
         {
-            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandGetElementInfo(this));
+            if (ModuleData.isDocumentAvailable)
+            {
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandGetElementInfo(this));
+            }
+            else
+            {
+                MessageBox.Show("Ни один документ не открыт. Получение информации об элементах невозможна.", "Ошибка!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            }
         }
 
         public bool setRuleFromElement(BuiltInCategory builtInCategory, string familyName, string typeName, List<string> paramValues)
@@ -189,20 +214,26 @@ namespace ClassificatorComplete.Forms
 
         private void Choose_ParamName_Click(object sender, RoutedEventArgs e)
         {
-            Button bt = (Button)sender;
-            ParamNameItem paramItem = bt.DataContext as ParamNameItem;
-            ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, paramItem);
-            parameterSelectorForm.ShowDialog();
+            if (ModuleData.isDocumentAvailable)
+            {
+                Button bt = (Button)sender;
+                ParamNameItem paramItem = bt.DataContext as ParamNameItem;
+                ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, paramItem);
+                parameterSelectorForm.ShowDialog();
+            }
         }
 
         private void Insert_ParamName_Click(object sender, RoutedEventArgs e)
         {
-            Button bt = (Button)sender;
-            ParamValueItem valueItem = bt.DataContext as ParamValueItem;
-            if (valueItem.paramValue.Contains("[]"))
+            if (ModuleData.isDocumentAvailable)
             {
-                ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, valueItem);
-                parameterSelectorForm.ShowDialog();
+                Button bt = (Button)sender;
+                ParamValueItem valueItem = bt.DataContext as ParamValueItem;
+                if (valueItem.paramValue.Contains("[]"))
+                {
+                    ParameterSelectorForm parameterSelectorForm = new ParameterSelectorForm(classificatorForm.mparams, valueItem);
+                    parameterSelectorForm.ShowDialog();
+                }
             }
         }
 
@@ -229,7 +260,7 @@ namespace ClassificatorComplete.Forms
             }
             if (findDoubledRules())
             {
-                if(MessageBox.Show("В файле присутствуют дублирующие друг друга правила! Они подкрашены серым цветом.", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                if (MessageBox.Show("В файле присутствуют дублирующие друг друга правила! Они подкрашены серым цветом.", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
                 {
                     return;
                 }
@@ -267,6 +298,10 @@ namespace ClassificatorComplete.Forms
             this.Collection.ItemsSource = ruleItems;
             refreshNumbersOfRules(ruleItems);
             findDoubledRules();
+            if (ModuleData.isDocumentAvailable)
+            {
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindAllElementsInModel(ruleItems));
+            }
         }
 
         public bool findDoubledRules()
@@ -298,13 +333,13 @@ namespace ClassificatorComplete.Forms
             }
             foreach (var item in doubledItems)
             {
-                item.colourOfRule = BackGroundColour.DOUBLED_RULE;
+                item.colourOfRule = ColourUtils.DOUBLED_RULE;
             }
             foreach (var item in ruleItems)
             {
-                if (!doubledItems.Contains(item) && item.colourOfRule.Equals(BackGroundColour.DOUBLED_RULE))
+                if (!doubledItems.Contains(item) && item.colourOfRule.Equals(ColourUtils.DOUBLED_RULE))
                 {
-                    item.colourOfRule = BackGroundColour.NEW_RULE;
+                    item.colourOfRule = ColourUtils.NEW_RULE;
                 }
             }
             return doubledItems.Count == 0 ? false : true;

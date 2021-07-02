@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using static ClassificatorComplete.ModuleData;
 
 namespace ClassificatorComplete
 {
@@ -15,6 +18,18 @@ namespace ClassificatorComplete
         public static string assemblyPath = "";
         public Result Execute(UIControlledApplication application, string tabName)
         {
+#if Revit2020
+            MainWindowHandle = application.MainWindowHandle;
+            HwndSource hwndSource = HwndSource.FromHwnd(MainWindowHandle);
+            RevitWindow = hwndSource.RootVisual as Window;
+#endif
+#if Revit2018
+            try
+            {
+                MainWindowHandle = ClassificatorComplete.SystemTools.WindowHandleSearch.MainWindowHandle.Handle;
+            }
+            catch (Exception) { }
+#endif
             assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             try { application.CreateRibbonTab(tabName); } catch { }
 
@@ -44,6 +59,7 @@ namespace ClassificatorComplete
                 "Маппинг параметров (передача значений между параметрами элемента);\n" +
                 "Сохранение конфигурационного файла с возможностью повторного использования;\n";
             btnHostMark.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, @"https://yandex.ru/"));
+            btnHostMark.AvailabilityClassName = "ClassificatorComplete.Availability.StaticAvailable";
 
             panel.AddItem(btnHostMark);
 

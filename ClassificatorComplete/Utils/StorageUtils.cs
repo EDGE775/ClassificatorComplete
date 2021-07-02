@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using static KPLN_Loader.Output.Output;
+using static ClassificatorComplete.ModuleData;
 
 namespace ClassificatorComplete
 {
@@ -23,7 +24,7 @@ namespace ClassificatorComplete
             UtilsStorage utilsStorage = null;
             try
             {
-                using (StreamReader r = new StreamReader("C:\\TEMP\\ccsettings.xml"))
+                using (StreamReader r = new StreamReader(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
                 {
                     utilsStorage = (UtilsStorage)storageSerializer.Deserialize(r);
                 }
@@ -67,7 +68,7 @@ namespace ClassificatorComplete
                 Directory.CreateDirectory("C:\\TEMP");
             }
 
-            using (StreamWriter r = new StreamWriter("C:\\TEMP\\ccsettings.xml"))
+            using (StreamWriter r = new StreamWriter(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
             {
                 storageSerializer.Serialize(r, utilsStorage);
             }
@@ -85,7 +86,7 @@ namespace ClassificatorComplete
             UtilsStorage utilsStorage = null;
             try
             {
-                using (StreamReader r = new StreamReader("C:\\TEMP\\ccsettings.xml"))
+                using (StreamReader r = new StreamReader(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
                 {
                     utilsStorage = (UtilsStorage)utilsSerializer.Deserialize(r);
                 }
@@ -118,7 +119,7 @@ namespace ClassificatorComplete
                 Directory.CreateDirectory("C:\\TEMP");
             }
 
-            using (StreamWriter r = new StreamWriter("C:\\TEMP\\ccsettings.xml"))
+            using (StreamWriter r = new StreamWriter(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
             {
                 utilsSerializer.Serialize(r, utilsStorage);
             }

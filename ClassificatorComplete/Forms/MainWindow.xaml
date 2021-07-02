@@ -131,7 +131,7 @@
                                                                 </TextBox>
                                                                 <Button Grid.Column="1" Content="+" Click="Add_Value_Click" Background="White" Margin="2,0,1,0"/>
                                                                 <Button Grid.Column="2" Content="Х" Click="Delete_Value_Click" Background="White" Margin="1,0,2,0"/>
-                                                                <Button Grid.Column="3" Content="🔍" Click="Insert_ParamName_Click"  Background="White" Margin="1,0,2,0"/>
+                                                                <Button Grid.Column="3" Content="🔍" Click="Insert_ParamName_Click"  Background="White" Margin="1,0,2,0" Visibility="{Binding visibleOfFindButton, UpdateSourceTrigger=PropertyChanged}"/>
                                                             </Grid>
                                                         </GroupBox>
                                                     </DataTemplate>
@@ -150,7 +150,7 @@
                                                     </ToolTip>
                                                 </ComboBox.ToolTip>
                                             </ComboBox>
-                                                <GroupBox Header="{Binding familyNameTextBox, UpdateSourceTrigger=PropertyChanged}"  BorderThickness="0" Foreground="White">
+                                            <GroupBox Header="{Binding familyNameTextBox, UpdateSourceTrigger=PropertyChanged}"  BorderThickness="0" Foreground="White">
                                                 <TextBox Text="{Binding familyNameValue, UpdateSourceTrigger=PropertyChanged}" ToolTipService.InitialShowDelay="2000" ToolTipService.ShowDuration="20000" TextWrapping="Wrap">
                                                     <TextBox.ToolTip>
                                                         <ToolTip Background="#FFFFD100" Foreground="Black" HasDropShadow="False" Placement="Relative" HorizontalOffset="15" VerticalOffset="25" >
@@ -184,6 +184,10 @@
                                                     </TextBox.ToolTip>
                                                 </TextBox>
                                             </GroupBox>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Найдено элементов в модели: " Foreground="WhiteSmoke"></TextBlock>
+                                                <TextBlock Text="{Binding elemsCountInModel, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" Foreground="WhiteSmoke"></TextBlock>
+                                            </StackPanel>
                                         </StackPanel>
                                         <Grid Grid.Column="2" Grid.Row="0">
                                             <Grid.RowDefinitions>

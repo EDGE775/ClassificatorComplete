@@ -38,5 +38,20 @@ namespace ClassificatorComplete.Forms.ViewModels
         {
             this.paramName = paramName;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ParamNameItem item &&
+                   paramName == item.paramName &&
+                   paramNumber == item.paramNumber;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = -946399840;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(paramName);
+            hashCode = hashCode * -1521134295 + paramNumber.GetHashCode();
+            return hashCode;
+        }
     }
 }

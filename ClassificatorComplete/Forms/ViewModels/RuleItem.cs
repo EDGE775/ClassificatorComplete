@@ -35,7 +35,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             {
                 _familyNameValue = value;
                 NotifyPropertyChanged();
-                this.colourOfRule = BackGroundColour.NEW_RULE;
+                this.colourOfRule = ColourUtils.NEW_RULE;
             }
         }
         private string _familyNameTextBox { get; set; }
@@ -62,7 +62,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             {
                 _typeNameValue = value;
                 NotifyPropertyChanged();
-                this.colourOfRule = BackGroundColour.NEW_RULE;
+                this.colourOfRule = ColourUtils.NEW_RULE;
             }
         }
         private string _typeNameTextBox { get; set; }
@@ -93,7 +93,7 @@ namespace ClassificatorComplete.Forms.ViewModels
                 familyNameTextBox = builtInCategoryName.Equals(BuiltInCategory.OST_Rooms) ? "Параметр \"Назначение\" помещения содержит:" : "Имя семейства содержит:";
                 typeNameTextBox = builtInCategoryName.Equals(BuiltInCategory.OST_Rooms) ? "Параметр \"Имя\" помещения содержит:" : "Имя типа содержит:";
                 NotifyPropertyChanged();
-                this.colourOfRule = BackGroundColour.NEW_RULE;
+                this.colourOfRule = ColourUtils.NEW_RULE;
             }
         }
 
@@ -112,6 +112,19 @@ namespace ClassificatorComplete.Forms.ViewModels
         }
         public ObservableCollection<ParamValueItem> valuesOfParams { get; set; }
         public static List<BuiltInCategory> builtInCats { get; set; }
+        private int _elemsCountInModel { get; set; }
+        public int elemsCountInModel
+        {
+            get
+            {
+                return _elemsCountInModel;
+            }
+            set
+            {
+                _elemsCountInModel = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public RuleItem(string familyNameValue, string typeNameValue, BuiltInCategory builtInCategoryName)
         {
@@ -119,6 +132,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             this.typeNameValue = typeNameValue;
             this.valuesOfParams = new ObservableCollection<ParamValueItem>();
             this.builtInCategoryName = builtInCategoryName;
+            this.elemsCountInModel = -1;
         }
 
         public static void refreshNumbersOfValues(ObservableCollection<ParamValueItem> valuesOfParams)
@@ -132,14 +146,14 @@ namespace ClassificatorComplete.Forms.ViewModels
         public void addValueOfParam(string paramValue)
         {
             valuesOfParams.Add(new ParamValueItem(paramValue, this));
-            this.colourOfRule = BackGroundColour.NEW_RULE;
+            this.colourOfRule = ColourUtils.NEW_RULE;
             refreshNumbersOfValues(valuesOfParams);
         }
 
         public void addValueOfParamByIndex(string paramValue, int index)
         {
             valuesOfParams.Insert(index, new ParamValueItem(paramValue, this));
-            this.colourOfRule = BackGroundColour.NEW_RULE;
+            this.colourOfRule = ColourUtils.NEW_RULE;
             refreshNumbersOfValues(valuesOfParams);
         }
 
@@ -147,7 +161,7 @@ namespace ClassificatorComplete.Forms.ViewModels
         {
             if (valuesOfParams.Remove(valueItem))
             {
-                this.colourOfRule = BackGroundColour.NEW_RULE;
+                this.colourOfRule = ColourUtils.NEW_RULE;
                 refreshNumbersOfValues(valuesOfParams);
                 return true;
             }

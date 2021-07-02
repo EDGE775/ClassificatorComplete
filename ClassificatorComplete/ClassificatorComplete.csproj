@@ -91,12 +91,15 @@
   </Choose>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Availability\StaticAvailable.cs" />
+    <Compile Include="CommandFindAllElementsInModel.cs" />
     <Compile Include="CommandFindElementsInModel.cs" />
     <Compile Include="CommandGetElementInfo.cs" />
     <Compile Include="CommandOpenClassificatorForm.cs" />
     <Compile Include="Data\Classificator.cs" />
     <Compile Include="CommandStartClassificator.cs" />
     <Compile Include="Data\InfosStorage.cs" />
+    <Compile Include="Data\LastRunInfo.cs" />
     <Compile Include="Data\UtilsStorage.cs" />
     <Compile Include="Forms\ClassificatorForm.cs">
       <SubType>Form</SubType>
@@ -116,11 +119,13 @@
     <Compile Include="Forms\ViewModels\RuleItem.cs" />
     <Compile Include="Forms\ViewModels\Settings.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="ModuleData.cs" />
     <Compile Include="Output\OutputDebug.cs" />
+    <Compile Include="SystemTools\WindowHandleSearch.cs" />
     <Compile Include="Utils\MyParameter.cs" />
     <Compile Include="Utils\ParamUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\BackGroundColour.cs" />
+    <Compile Include="Utils\ColourUtils.cs" />
     <Compile Include="Utils\StorageUtils.cs" />
     <Compile Include="Utils\ViewUtils.cs" />
   </ItemGroup>

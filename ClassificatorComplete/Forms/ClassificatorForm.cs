@@ -11,12 +11,14 @@ using ElementId = Autodesk.Revit.DB.ElementId;
 using Category = Autodesk.Revit.DB.Category;
 using BuiltInCategory = Autodesk.Revit.DB.BuiltInCategory;
 using ClassificatorComplete.Utils;
+using System.Windows.Interop;
+using ClassificatorComplete.Data;
 
 namespace ClassificatorComplete.Forms
 {
     public partial class ClassificatorForm : Form
     {
-        private StorageUtils utils;
+        public StorageUtils utils;
         public InfosStorage storage;
         public bool debugMode;
         public int instanceOrType;
@@ -24,13 +26,26 @@ namespace ClassificatorComplete.Forms
         public MainWindow form;
         public List<BuiltInCategory> allCats;
         public List<MyParameter> mparams;
+        public long hashSumOfClassificator;
+
+        public LastRunInfo lastRunInfo;
 
         public ClassificatorForm(StorageUtils utils, List<MyParameter> mparams)
+        {
+            if (ModuleData.isDocumentAvailable)
+            {
+                this.lastRunInfo = LastRunInfo.getInstance();
+            }
+            initForm(utils, mparams);
+        }
+
+        private void initForm(StorageUtils utils, List<MyParameter> mparams)
         {
             InitializeComponent();
             this.utils = utils;
             debugMode = checkBoxDebug.Checked;
             textBoxFileInfo.Text = "Конфигурационный файл не выбран.";
+            textBoxFileInfo.Text += Environment.NewLine;
             btnOk.Enabled = false;
             checkedCats = new List<BuiltInCategory>();
             if (radioButtonTypeParams.Checked) instanceOrType = 2;
@@ -38,20 +53,27 @@ namespace ClassificatorComplete.Forms
             buttonOpenConfiguration.Enabled = false;
             buttonSaveFile.Enabled = false;
             this.mparams = mparams;
+            if (ModuleData.isDocumentAvailable && lastRunInfo != null)
+            {
+                getInfoAboutFileClassification();
+            }
         }
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            foreach (var checkedItem in checkedListBox1.CheckedItems)
+            if (ModuleData.isDocumentAvailable)
             {
-                BuiltInCategory cat = (BuiltInCategory)checkedItem;
-                checkedCats.Add(cat);
+                foreach (var checkedItem in checkedListBox1.CheckedItems)
+                {
+                    BuiltInCategory cat = (BuiltInCategory)checkedItem;
+                    checkedCats.Add(cat);
+                }
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandStartClassificator(this));
             }
-
-            //this.DialogResult = DialogResult.OK;
-            //this.Close();
-
-            KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandStartClassificator(this));
+            else
+            {
+                MessageBox.Show("Ни один документ не открыт. Запуск классификатора невозможен.", "Ошибка!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -65,6 +87,12 @@ namespace ClassificatorComplete.Forms
             storage = utils.getInfoStorage();
             if (storage != null)
             {
+                //hashSum = getHashSumOfClassificator();
+                if (hashSumOfClassificator != 0)
+                {
+                    hashSumOfClassificator = 0L;
+                    form = null;
+                }
                 checkFileIsCorrect();
                 setRadioButton();
             }
@@ -108,10 +136,17 @@ namespace ClassificatorComplete.Forms
                 textBoxFileInfo.Text = "";
                 textBoxFileInfo.Text += "Выбран конфигурационный файл:" + Environment.NewLine;
                 textBoxFileInfo.Text += Environment.NewLine;
-                textBoxFileInfo.Text += utils.xmlFilePath != null ? utils.xmlFilePath + Environment.NewLine : "Создан новый конфигурационный файл. Файл не сохранён!";
+                textBoxFileInfo.Text += hashSumOfClassificator == getHashSumOfClassificator() 
+                    ? (utils.xmlFilePath != null ? utils.xmlFilePath : "") + Environment.NewLine 
+                    : "Внимание! Конфигурационный файл изменён и не сохранён!" + Environment.NewLine;
                 textBoxFileInfo.Text += Environment.NewLine;
                 string info = storage.instanceOrType == 1 ? "ЭКЗЕМПЛЯРУ" : storage.instanceOrType == 2 ? "ТИПУ" : "НЕКОРРЕКТНАЯ НАСТРОЙКА КОНФИГУРАЦИОННОГО ФАЙЛА!";
                 textBoxFileInfo.Text += string.Format("Файл содержит {0} правил(о/а/ов) для заполнения классиифкатора по {1}.", storage.classificator.Count.ToString(), info);
+                textBoxFileInfo.Text += Environment.NewLine;
+                if (ModuleData.isDocumentAvailable && lastRunInfo != null)
+                {
+                    getInfoAboutFileClassification();
+                }
                 btnOk.Enabled = true;
 
                 checkedListBox1.Items.Clear();
@@ -120,6 +155,7 @@ namespace ClassificatorComplete.Forms
                     checkedListBox1.Items.Add(bic, CheckState.Checked);
                 }
                 buttonOpenConfiguration.Enabled = true;
+
                 return true;
             }
             else
@@ -130,6 +166,16 @@ namespace ClassificatorComplete.Forms
                 btnOk.Enabled = false;
                 buttonSaveFile.Enabled = false;
                 return false;
+            }
+        }
+
+        private void getInfoAboutFileClassification()
+        {
+            string[] infoArray = lastRunInfo.ToString().Split('=');
+            textBoxFileInfo.Text += Environment.NewLine;
+            foreach (var item in infoArray)
+            {
+                textBoxFileInfo.Text += item + Environment.NewLine;
             }
         }
 
@@ -158,6 +204,10 @@ namespace ClassificatorComplete.Forms
             }
             this.Hide();
             form = new MainWindow(this, storage, allCats);
+            if (form != null && hashSumOfClassificator == 0)
+            {
+                hashSumOfClassificator = getHashSumOfClassificator();
+            }
             form.Show();
         }
 
@@ -193,6 +243,7 @@ namespace ClassificatorComplete.Forms
                 }
                 allCats.Sort((x, y) => x.ToString().CompareTo(y.ToString()));
             }
+            utils.xmlFilePath = null;
             this.Hide();
             storage = new InfosStorage();
             form = new MainWindow(this, storage, allCats);
@@ -202,7 +253,29 @@ namespace ClassificatorComplete.Forms
         private void buttonSaveFile_Click(object sender, EventArgs e)
         {
             utils.saveInfoStorage(storage);
+            hashSumOfClassificator = getHashSumOfClassificator();
             checkFileIsCorrect();
+        }
+
+        private long getHashSumOfClassificator()
+        {
+            long sum = 0L;
+            if (form != null && form.ruleItems != null)
+            {
+                foreach (var ruleItem in form.ruleItems)
+                {
+                    sum += ruleItem.GetHashCode();
+                    foreach (var valueItem in ruleItem.valuesOfParams)
+                    {
+                        sum += valueItem.GetHashCode();
+                    }
+                }
+                foreach (var paramName in form.settings.paramNameItems)
+                {
+                    sum += paramName.GetHashCode();
+                }
+            }
+            return sum;
         }
     }
 }

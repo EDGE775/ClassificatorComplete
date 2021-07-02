@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -29,6 +30,14 @@ namespace ClassificatorComplete.Forms
 
         public ParameterSelectorForm(List<MyParameter> mparams, ParamNameItem paramItem)
         {
+#if Revit2020
+            Owner = ModuleData.RevitWindow;
+#endif
+#if Revit2018
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            helper.Owner = ModuleData.MainWindowHandle;
+#endif
+
             InitializeComponent();
             this.mparams = mparams;
             this.Collection.ItemsSource = this.mparams;

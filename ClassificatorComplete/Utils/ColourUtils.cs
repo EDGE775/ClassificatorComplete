@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassificatorComplete.Utils
 {
-    public static class BackGroundColour
+    public static class ColourUtils
     {
         public readonly static string NEW_RULE = "#ff6900";
         public readonly static string OLD_RULE = "#4C87B3";

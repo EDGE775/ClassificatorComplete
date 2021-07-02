@@ -144,16 +144,27 @@ namespace ClassificatorComplete
                     newValue = newValue.Replace(item, itemValue);
                 }
             }
-
+            Parameter param = elem.LookupParameter(paramName);
             try
             {
-                elem.LookupParameter(paramName).Set(newValue);
+                if (param.StorageType == StorageType.String)
+                {
+                    param.Set(newValue);
+                }
+                else if (param.StorageType == StorageType.Double)
+                {
+                    param.Set(double.Parse(newValue));
+                }
+                else if (param.StorageType == StorageType.Integer)
+                {
+                    param.Set(int.Parse(newValue));
+                }
                 valueForAssigned = newValue;
                 rsl = true;
             }
             catch (Exception)
             {
-                Print(string.Format("Не удалось назначить параметр: \"{0}\" элементу: {1} с id: {2}", paramName, elem.Name, elem.Id), KPLN_Loader.Preferences.MessageType.Warning);
+                Print(string.Format("Не удалось присвоить значение \"{0}\" параметру: \"{1}\" с типом данных: {2}. Элемент: {3} с id: {4}", newValue, paramName, param.StorageType.ToString(), elem.Name, elem.Id), KPLN_Loader.Preferences.MessageType.Warning);
             }
             return rsl;
         }
@@ -270,7 +281,7 @@ namespace ClassificatorComplete
             {
                 PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), KPLN_Loader.Preferences.MessageType.Code, debugMode);
             }
-            PrintDebug("Заполнение классификатора ↑", KPLN_Loader.Preferences.MessageType.Header, debugMode);
+            PrintDebug(string.Format("Заполнение классификатора по {0} ↑", storage.instanceOrType == 1 ? "экземпляру" : "типу"), KPLN_Loader.Preferences.MessageType.Header, debugMode);
 
             foreach (Element elem in constrs)
             {

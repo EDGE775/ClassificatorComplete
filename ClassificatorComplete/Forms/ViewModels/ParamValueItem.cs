@@ -35,16 +35,35 @@ namespace ClassificatorComplete.Forms.ViewModels
                 NotifyPropertyChanged();
                 if (parent != null)
                 {
-                    parent.colourOfRule = BackGroundColour.NEW_RULE;
+                    parent.colourOfRule = ColourUtils.NEW_RULE;
+                    visibleOfFindButton = "Hidden";
                 }
                 if (_paramValue != null && !isParamValueCorrect(_paramValue))
                 {
-                    colourOfValueBack = BackGroundColour.WRONG_VALUE;
+                    colourOfValueBack = ColourUtils.WRONG_VALUE;
+                    visibleOfFindButton = "Hidden";
                 }
                 else
                 {
-                    colourOfValueBack = BackGroundColour.CORRECT_VALUE;
+                    colourOfValueBack = ColourUtils.CORRECT_VALUE;
+                    if (_paramValue.Contains("[]"))
+                    {
+                        visibleOfFindButton = "Visible";
+                    }
                 }
+            }
+        }
+        private string _visibleOfFindButton { get; set; } = "Hidden";
+        public string visibleOfFindButton
+        {
+            get
+            {
+                return _visibleOfFindButton;
+            }
+            set
+            {
+                _visibleOfFindButton = value;
+                NotifyPropertyChanged();
             }
         }
         public RuleItem parent { get; set; }
@@ -66,7 +85,7 @@ namespace ClassificatorComplete.Forms.ViewModels
         {
             this.paramValue = paramValue;
             this.parent = parent;
-            this.colourOfValueBack = BackGroundColour.CORRECT_VALUE;
+            this.colourOfValueBack = ColourUtils.CORRECT_VALUE;
         }
 
         public override bool Equals(object obj)
