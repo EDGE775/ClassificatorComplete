@@ -44,6 +44,6 @@ Project is: _in progress_
 Created by Khlapov Dmitry - feel free to contact me!
 
 ## Screenshots
-![Slide1](./Docs/slide1.PNG)
-![Slide2](./Docs/slide2.PNG)
-![Slide3](./Docs/slide3.PNG)
+![Slide1](./Docs/slide1.png)
+![Slide2](./Docs/slide2.png)
+![Slide3](./Docs/slide3.png)

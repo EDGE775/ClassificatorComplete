@@ -146,9 +146,6 @@
     <EmbeddedResource Include="Resources\icon_manager.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Docs\slide1.png" />
-    <Content Include="Docs\slide2.png" />
-    <Content Include="Docs\slide3.png" />
     <Content Include="Resources\Классификатор_типы.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -160,9 +157,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
