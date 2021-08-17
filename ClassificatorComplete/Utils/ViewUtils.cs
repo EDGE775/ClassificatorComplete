@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static KPLN_Loader.Output.Output;
+using static ClassificatorComplete.ApplicationConfig;
 
 namespace ClassificatorComplete
 {
@@ -44,7 +44,7 @@ namespace ClassificatorComplete
             }
             if (fillPattern == null)
             {
-                Print("Заливка \"Сплошная заливка\" не найдена", KPLN_Loader.Preferences.MessageType.Error);
+                output.PrintInfo("Заливка \"Сплошная заливка\" не найдена", Output.OutputMessageType.Error);
                 return null;
             }
 

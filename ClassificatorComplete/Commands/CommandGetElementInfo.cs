@@ -8,7 +8,6 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.ApplicationServices;
 using System.IO;
 using System.Xml;
-using static KPLN_Loader.Output.Output;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
 using ClassificatorComplete.Forms;
@@ -19,7 +18,7 @@ using ClassificatorComplete.Forms.ViewModels;
 
 namespace ClassificatorComplete
 {
-    public class CommandGetElementInfo : IExecutableCommand
+    public class CommandGetElementInfo : IExecutableCommand, MyExecutableCommand
     {
         private MainWindow form;
         public List<string> paramNames;

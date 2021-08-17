@@ -1,14 +1,14 @@
 ﻿using Autodesk.Revit.UI;
+using ClassificatorComplete.ExecutableCommand;
+using ClassificatorComplete.UserInfo;
 using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using static ClassificatorComplete.ModuleData;
+using static ClassificatorComplete.ApplicationConfig;
 
 namespace ClassificatorComplete
 {
@@ -16,6 +16,15 @@ namespace ClassificatorComplete
     public class Module : IExternalModule
     {
         public static string assemblyPath = "";
+
+        public Module()
+        {
+            //Конфигурирование приложения для работы в среде KPLN_Loader
+            output = new KplnOutput();
+            userInfo = new KplnUserInfo();
+            commandEnvironment = new KplnCommandEnvironment();
+        }
+
         public Result Execute(UIControlledApplication application, string tabName)
         {
 #if Revit2020
@@ -26,7 +35,7 @@ namespace ClassificatorComplete
 #if Revit2018
             try
             {
-                MainWindowHandle = ClassificatorComplete.SystemTools.WindowHandleSearch.MainWindowHandle.Handle;
+                MainWindowHandle = SystemTools.WindowHandleSearch.MainWindowHandle.Handle;
             }
             catch (Exception) { }
 #endif

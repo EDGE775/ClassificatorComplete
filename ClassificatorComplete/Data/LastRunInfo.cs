@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static KPLN_Loader.Output.Output;
 using System.Threading.Tasks;
+using static ClassificatorComplete.ApplicationConfig;
 
 namespace ClassificatorComplete.Data
 {
@@ -13,11 +13,11 @@ namespace ClassificatorComplete.Data
     {
         private static LastRunInfo instance;
         private static readonly string schemaGuid = "720080CB-DA99-40DC-9415-E53F280AA1F8";
+        private static Document document;
         private Schema sch;
         private string userName;
         private string fileName;
         private string date;
-        private Document doc;
 
         public override string ToString()
         {
@@ -26,8 +26,8 @@ namespace ClassificatorComplete.Data
 
         private LastRunInfo(Document doc)
         {
-            this.doc = doc;
-            Element storageElement = this.GetStorageElement();
+            document = doc;
+            Element storageElement = GetStorageElement();
 
             if (CheckStorageExists(storageElement, schemaGuid))
             {
@@ -48,13 +48,30 @@ namespace ClassificatorComplete.Data
             }
         }
 
+        private LastRunInfo()
+        {
+            Element storageElement = GetStorageElement();
+
+            if (CheckStorageExists(storageElement, schemaGuid))
+            {
+                getLastRunInfo();
+            }
+            else
+            {
+                createSchemaStorage();
+                saveFirstRunInfo();
+                getLastRunInfo();
+            }
+        }
+
+        public string getFileName()
+        {
+            return fileName;
+        }
+
         public static LastRunInfo createInstance(Document doc)
         {
-            if (instance == null)
-            {
-                instance = new LastRunInfo(doc);
-            }
-            return instance;
+            return instance = new LastRunInfo(doc);
         }
 
         public static LastRunInfo getInstance()
@@ -66,11 +83,21 @@ namespace ClassificatorComplete.Data
             return instance;
         }
 
+        public static LastRunInfo getInstanceOrCreateNew(Document newDoc)
+        {
+            if (instance == null || !document.Equals(newDoc))
+            {
+                output.PrintInfo(string.Format("Изменён активный документ с {0} на {1}", document.Title, newDoc.Title), Output.OutputMessageType.Warning);
+                document = newDoc;
+                return instance = new LastRunInfo();
+            }
+            return instance;
+        }
         public void save(string filePath)
         {
-            this.date = getCurrentTime();
-            this.userName = getUserNameFromDB();
-            this.fileName = filePath;
+            date = getCurrentTime();
+            userName = getUserNameFromSourse();
+            fileName = filePath;
             Dictionary<string, string> fieldsAndValues = new Dictionary<string, string>();
             fieldsAndValues.Add("UserName", userName);
             fieldsAndValues.Add("FileName", fileName);
@@ -81,9 +108,9 @@ namespace ClassificatorComplete.Data
             }
         }
 
-        private string getUserNameFromDB()
+        private string getUserNameFromSourse()
         {
-            return string.Format("{0} {1}", KPLN_Loader.Preferences.User.Family, KPLN_Loader.Preferences.User.Name);
+            return userInfo.getUserName();
         }
 
         private string getCurrentTime()
@@ -105,7 +132,7 @@ namespace ClassificatorComplete.Data
 
         private Element GetStorageElement()
         {
-            BrowserOrganization bo = new FilteredElementCollector(doc)
+            BrowserOrganization bo = new FilteredElementCollector(document)
             .OfClass(typeof(BrowserOrganization))
             .Cast<BrowserOrganization>()
             .First();

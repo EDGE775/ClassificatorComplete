@@ -1,21 +1,9 @@
 ﻿using ClassificatorComplete.Forms.ViewModels;
 using ClassificatorComplete.Utils;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ClassificatorComplete.Forms
 {
@@ -25,42 +13,26 @@ namespace ClassificatorComplete.Forms
     public partial class ParameterSelectorForm : Window
     {
         public List<MyParameter> mparams;
-        public ParamNameItem paramItem;
-        public ParamValueItem valueItem;
+        public BaseViewModel someModel;
 
-        public ParameterSelectorForm(List<MyParameter> mparams, ParamNameItem paramItem)
-        {
-#if Revit2020
-            Owner = ModuleData.RevitWindow;
-#endif
-#if Revit2018
-            WindowInteropHelper helper = new WindowInteropHelper(this);
-            helper.Owner = ModuleData.MainWindowHandle;
-#endif
-
-            InitializeComponent();
-            this.mparams = mparams;
-            this.Collection.ItemsSource = this.mparams;
-            this.paramItem = paramItem;
-        }
-
-        public ParameterSelectorForm(List<MyParameter> mparams, ParamValueItem valueItem)
+        public ParameterSelectorForm(List<MyParameter> mparams, BaseViewModel someModel)
         {
             InitializeComponent();
+            this.someModel = someModel;
             this.mparams = mparams;
             this.Collection.ItemsSource = this.mparams;
-            this.valueItem = valueItem;
         }
 
         private void Accept_ParamName_Click(object sender, RoutedEventArgs e)
         {
             MyParameter parameter = (MyParameter)Collection.SelectedItem;
-            if (valueItem == null)
+            if (someModel is ParamNameItem)
             {
-                paramItem.paramName = parameter.Name;
+                (someModel as ParamNameItem).paramName = parameter.Name;
             }
-            else if (paramItem == null)
+            else if (someModel is ParamValueItem)
             {
+                ParamValueItem valueItem = someModel as ParamValueItem;
                 var regex = new Regex(Regex.Escape("[]"));
                 valueItem.paramValue = regex.Replace(valueItem.paramValue, string.Format("[{0}]", parameter.Name), 1);
             }

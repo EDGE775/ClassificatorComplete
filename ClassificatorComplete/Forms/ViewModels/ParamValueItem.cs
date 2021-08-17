@@ -35,7 +35,7 @@ namespace ClassificatorComplete.Forms.ViewModels
                 NotifyPropertyChanged();
                 if (parent != null)
                 {
-                    parent.colourOfRule = ColourUtils.NEW_RULE;
+                    parent.checkChanges();
                     visibleOfFindButton = "Hidden";
                 }
                 if (_paramValue != null && !isParamValueCorrect(_paramValue))

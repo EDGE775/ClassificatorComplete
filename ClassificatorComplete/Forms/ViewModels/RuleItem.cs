@@ -11,6 +11,7 @@ namespace ClassificatorComplete.Forms.ViewModels
 {
     public class RuleItem : BaseViewModel
     {
+        private long hashSumOfRuleItem;
         private string _colourOfRule { get; set; }
         public string colourOfRule
         {
@@ -35,7 +36,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             {
                 _familyNameValue = value;
                 NotifyPropertyChanged();
-                this.colourOfRule = ColourUtils.NEW_RULE;
+                checkChanges();
             }
         }
         private string _familyNameTextBox { get; set; }
@@ -62,7 +63,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             {
                 _typeNameValue = value;
                 NotifyPropertyChanged();
-                this.colourOfRule = ColourUtils.NEW_RULE;
+                checkChanges();
             }
         }
         private string _typeNameTextBox { get; set; }
@@ -93,7 +94,7 @@ namespace ClassificatorComplete.Forms.ViewModels
                 familyNameTextBox = builtInCategoryName.Equals(BuiltInCategory.OST_Rooms) ? "Параметр \"Назначение\" помещения содержит:" : "Имя семейства содержит:";
                 typeNameTextBox = builtInCategoryName.Equals(BuiltInCategory.OST_Rooms) ? "Параметр \"Имя\" помещения содержит:" : "Имя типа содержит:";
                 NotifyPropertyChanged();
-                this.colourOfRule = ColourUtils.NEW_RULE;
+                checkChanges();
             }
         }
 
@@ -133,6 +134,7 @@ namespace ClassificatorComplete.Forms.ViewModels
             this.valuesOfParams = new ObservableCollection<ParamValueItem>();
             this.builtInCategoryName = builtInCategoryName;
             this.elemsCountInModel = -1;
+            hashSumOfRuleItem = getHashSumOfRuleItem();
         }
 
         public static void refreshNumbersOfValues(ObservableCollection<ParamValueItem> valuesOfParams)
@@ -146,14 +148,14 @@ namespace ClassificatorComplete.Forms.ViewModels
         public void addValueOfParam(string paramValue)
         {
             valuesOfParams.Add(new ParamValueItem(paramValue, this));
-            this.colourOfRule = ColourUtils.NEW_RULE;
+            checkChanges();
             refreshNumbersOfValues(valuesOfParams);
         }
 
         public void addValueOfParamByIndex(string paramValue, int index)
         {
             valuesOfParams.Insert(index, new ParamValueItem(paramValue, this));
-            this.colourOfRule = ColourUtils.NEW_RULE;
+            checkChanges();
             refreshNumbersOfValues(valuesOfParams);
         }
 
@@ -161,7 +163,7 @@ namespace ClassificatorComplete.Forms.ViewModels
         {
             if (valuesOfParams.Remove(valueItem))
             {
-                this.colourOfRule = ColourUtils.NEW_RULE;
+                checkChanges();
                 refreshNumbersOfValues(valuesOfParams);
                 return true;
             }
@@ -188,6 +190,41 @@ namespace ClassificatorComplete.Forms.ViewModels
         public override string ToString()
         {
             return this.GetType().ToString() + " " + familyNameValue + " " + typeNameValue;
+        }
+
+        private long getHashSumOfRuleItem()
+        {
+            try
+            {
+                long sum = 0L;
+                sum += GetHashCode();
+                foreach (ParamValueItem valueItem in valuesOfParams)
+                {
+                    sum += valueItem.GetHashCode();
+                }
+                return sum;
+            }
+            catch (Exception)
+            {
+                return hashSumOfRuleItem;
+            }
+        }
+
+        public void setHashSum()
+        {
+            hashSumOfRuleItem = getHashSumOfRuleItem();
+        }
+
+        public void checkChanges()
+        {
+            if (hashSumOfRuleItem != getHashSumOfRuleItem())
+            {
+                colourOfRule = ColourUtils.NEW_RULE;
+            }
+            else
+            {
+                colourOfRule = ColourUtils.OLD_RULE;
+            }
         }
     }
 }

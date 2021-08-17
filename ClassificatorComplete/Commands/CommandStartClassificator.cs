@@ -8,7 +8,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.ApplicationServices;
 using System.IO;
 using System.Xml;
-using static KPLN_Loader.Output.Output;
+using static ClassificatorComplete.ApplicationConfig;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
 using ClassificatorComplete.Forms;
@@ -16,7 +16,7 @@ using KPLN_Loader.Common;
 
 namespace ClassificatorComplete
 {
-    class CommandStartClassificator : IExecutableCommand
+    class CommandStartClassificator : IExecutableCommand, MyExecutableCommand
     {
         private ClassificatorForm form { get; set; }
 
@@ -31,11 +31,12 @@ namespace ClassificatorComplete
             View activeView = doc.ActiveView;
 
             bool debugMode = form.debugMode;
+            bool colourMode = form.colourMode;
 
             InfosStorage storage = form.storage;
             if (storage == null)
             {
-                Print("Не удалось обработать конфигурационный файл!", KPLN_Loader.Preferences.MessageType.Error);
+                output.PrintInfo("Не удалось обработать конфигурационный файл!", Output.OutputMessageType.Error);
                 return Result.Cancelled;
             }
 
@@ -67,8 +68,12 @@ namespace ClassificatorComplete
                     }
 
                     ParamUtils utilsForType = new ParamUtils(debugMode);
-                    utilsForType.startClassification(constrsTypes, storage, doc);
-                    Print(string.Format("Обработано элементов: {0}", utilsForType.fullSuccessElems.Count + utilsForType.notFullSuccessElems.Count), KPLN_Loader.Preferences.MessageType.Success);
+                    if (!utilsForType.startClassification(constrsTypes, storage, doc))
+                    {
+                        return Result.Cancelled;
+                    }
+                    output.PrintInfo(string.Format("Обработано элементов: {0}", utilsForType.fullSuccessElems.Count + utilsForType.notFullSuccessElems.Count), 
+                        Output.OutputMessageType.Success);
                 }
 
                 else if (form.instanceOrType == 1)
@@ -88,9 +93,12 @@ namespace ClassificatorComplete
                     }
 
                     ParamUtils utilsForInstanse = new ParamUtils(debugMode);
-                    utilsForInstanse.startClassification(constrsInstances, storage, doc);
+                    if (!utilsForInstanse.startClassification(constrsInstances, storage, doc))
+                    {
+                        return Result.Cancelled;
+                    }
 
-                    if (activeView.ViewType == ViewType.ThreeD)
+                    if (colourMode && activeView.ViewType == ViewType.ThreeD)
                     {
                         ViewUtils viewUtils = new ViewUtils(doc);
 
@@ -128,16 +136,23 @@ namespace ClassificatorComplete
                             catch { }
                         }
                     }
-                    Print(string.Format("Обработано элементов: {0}", 
-                        utilsForInstanse.fullSuccessElems.Count + utilsForInstanse.notFullSuccessElems.Count), 
-                        KPLN_Loader.Preferences.MessageType.Success);
-
-                    LastRunInfo.getInstance().save(form.utils.xmlFilePath);
+                    output.PrintInfo(string.Format("Обработано элементов: {0}", 
+                        utilsForInstanse.fullSuccessElems.Count + utilsForInstanse.notFullSuccessElems.Count), Output.OutputMessageType.Success);
                 }
                 else
                 {
-                    Print("Выбрана некорректная операция! Проверьте конфигурационный файл.", KPLN_Loader.Preferences.MessageType.Success);
+                    output.PrintInfo("Выбрана некорректная операция! Проверьте конфигурационный файл.", Output.OutputMessageType.Success);
                 }
+
+                try
+                {
+                    LastRunInfo.getInstanceOrCreateNew(doc).save(form.utils.xmlFilePath != null ? form.utils.xmlFilePath : "Файл конфигурации не был сохранён при последнем запуске!");
+                }
+                catch (Exception e)
+                {
+                    output.PrintErr(e, "Произошла ошибка в процессе сохранения информации о запуске плагина!");
+                }
+
                 t.Commit();
             }
             return Result.Succeeded;

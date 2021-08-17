@@ -18,8 +18,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BuiltInCategory = Autodesk.Revit.DB.BuiltInCategory;
-using static KPLN_Loader.Output.Output;
 using System.Windows.Interop;
+using System.IO;
+using static ClassificatorComplete.ApplicationConfig;
 
 namespace ClassificatorComplete.Forms
 {
@@ -36,13 +37,6 @@ namespace ClassificatorComplete.Forms
 
         public MainWindow(ClassificatorForm classificatorForm, InfosStorage storage, List<BuiltInCategory> allCats)
         {
-#if Revit2020
-            Owner = ModuleData.RevitWindow;
-#endif
-#if Revit2018
-            WindowInteropHelper helper = new WindowInteropHelper(this);
-            helper.Owner = ModuleData.MainWindowHandle;
-#endif
             InitializeComponent();
             this.classificatorForm = classificatorForm;
             this.storage = storage;
@@ -79,6 +73,7 @@ namespace ClassificatorComplete.Forms
                     {
                         ruleItem.addValueOfParam(pv);
                     }
+                    ruleItem.setHashSum();
                     ruleItem.colourOfRule = ColourUtils.OLD_RULE;
                     ruleItems.Add(ruleItem);
                 }
@@ -87,11 +82,21 @@ namespace ClassificatorComplete.Forms
                     settings.addParamName(item);
                 }
             }
+            fileName.Text = System.IO.Path.GetFileName(classificatorForm.utils.xmlFilePath);
+            rulesCount.Text = ruleItems.Count.ToString();
+            try
+            {
+                lastSaveOfFile.Text = File.GetLastWriteTime(classificatorForm.utils.xmlFilePath).ToString();
+            }
+            catch (Exception)
+            {
+                lastSaveOfFile.Text = "Файл не сохранён";
+            }
             findDoubledRules();
             refreshNumbersOfRules(ruleItems);
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
-                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindAllElementsInModel(ruleItems));
+                commandEnvironment.toEnqueue(new CommandFindAllElementsInModel(ruleItems));
             }
         }
 
@@ -112,28 +117,66 @@ namespace ClassificatorComplete.Forms
 
         private void Delete_Rule_Click(object sender, RoutedEventArgs e)
         {
-            Button bt = (Button)sender;
-            RuleItem ruleItem = bt.DataContext as RuleItem;
-            if (ruleItems.Count != 1)
+            if (MessageBox.Show("Удалить правило?", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
             {
-                ruleItems.Remove(ruleItem);
+                Button bt = (Button)sender;
+                RuleItem ruleItem = bt.DataContext as RuleItem;
+                if (ruleItems.Count != 1)
+                {
+                    ruleItems.Remove(ruleItem);
+                    refreshNumbersOfRules(ruleItems);
+                }
+            }
+        }
+
+        private void CopyRule_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Скопировать правило?", "Внимание!", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+            {
+                Button bt = (Button)sender;
+                RuleItem ruleItem = bt.DataContext as RuleItem;
+                RuleItem newRuleItem = new RuleItem(ruleItem.familyNameValue, ruleItem.typeNameValue, ruleItem.builtInCategoryName);
+                foreach (ParamValueItem item in ruleItem.valuesOfParams)
+                {
+                    newRuleItem.addValueOfParam(item.paramValue);
+                }
+                ruleItems.Insert(ruleItems.IndexOf(ruleItem) + 1, newRuleItem);
                 refreshNumbersOfRules(ruleItems);
+                if (isDocumentAvailable)
+                {
+                    commandEnvironment.toEnqueue(new CommandFindAllElementsInModel(new ObservableCollection<RuleItem>() { newRuleItem }));
+                }
             }
         }
 
         private void FindElementsByRule_Click(object sender, RoutedEventArgs e)
         {
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
                 Button bt = (Button)sender;
                 RuleItem ruleItem = bt.DataContext as RuleItem;
-                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItem));
+                commandEnvironment.toEnqueue(new CommandFindElementsInModel(new List<RuleItem>() { ruleItem }));
             }
             else
             {
                 MessageBox.Show("Ни один документ не открыт. Получение информации об элементах невозможна.", "Ошибка!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
             }
         }
+
+        private void FindAllElementsByRule_Click(object sender, RoutedEventArgs e)
+        {
+            if (isDocumentAvailable)
+            {
+                Button bt = (Button)sender;
+                RuleItem ruleItem = bt.DataContext as RuleItem;
+                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItems.ToList()));
+            }
+            else
+            {
+                MessageBox.Show("Ни один документ не открыт. Получение информации об элементах невозможна.", "Ошибка!", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            }
+        }
+
 
         private void Add_Rule_Click(object sender, RoutedEventArgs e)
         {
@@ -144,9 +187,9 @@ namespace ClassificatorComplete.Forms
 
         private void Get_Rule_Click(object sender, RoutedEventArgs e)
         {
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
-                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandGetElementInfo(this));
+                commandEnvironment.toEnqueue(new CommandGetElementInfo(this));
             }
             else
             {
@@ -214,7 +257,7 @@ namespace ClassificatorComplete.Forms
 
         private void Choose_ParamName_Click(object sender, RoutedEventArgs e)
         {
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
                 Button bt = (Button)sender;
                 ParamNameItem paramItem = bt.DataContext as ParamNameItem;
@@ -225,7 +268,7 @@ namespace ClassificatorComplete.Forms
 
         private void Insert_ParamName_Click(object sender, RoutedEventArgs e)
         {
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
                 Button bt = (Button)sender;
                 ParamValueItem valueItem = bt.DataContext as ParamValueItem;
@@ -243,12 +286,13 @@ namespace ClassificatorComplete.Forms
             settings.instanceOrType = pressed.Content.ToString().Contains("экземпляр") ? 1 : 2;
         }
 
-        private static void refreshNumbersOfRules(ObservableCollection<RuleItem> ruleItems)
+        private void refreshNumbersOfRules(ObservableCollection<RuleItem> ruleItems)
         {
             for (int i = 0; i < ruleItems.Count; i++)
             {
                 ruleItems[i].ruleNumber = i + 1;
             }
+            rulesCount.Text = ruleItems.Count.ToString();
         }
 
         private void Accept_Classificator_Click(object sender, RoutedEventArgs e)
@@ -268,6 +312,7 @@ namespace ClassificatorComplete.Forms
 
             storage.instanceOrType = settings.instanceOrType;
             storage.classificator.Clear();
+
             foreach (var item in ruleItems)
             {
                 Classificator classificator = new Classificator();
@@ -287,7 +332,7 @@ namespace ClassificatorComplete.Forms
         private void Sort_Classificator_Click(object sender, RoutedEventArgs e)
         {
             ObservableCollection<RuleItem> sortedCollection = new ObservableCollection<RuleItem>();
-            foreach (var elem in ruleItems
+            foreach (RuleItem elem in ruleItems
                 .OrderBy(x => x.builtInCategoryName.ToString())
                 .ThenBy(x => x.familyNameValue)
                 .ThenBy(x => x.typeNameValue))
@@ -298,9 +343,9 @@ namespace ClassificatorComplete.Forms
             this.Collection.ItemsSource = ruleItems;
             refreshNumbersOfRules(ruleItems);
             findDoubledRules();
-            if (ModuleData.isDocumentAvailable)
+            if (isDocumentAvailable)
             {
-                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindAllElementsInModel(ruleItems));
+                commandEnvironment.toEnqueue(new CommandFindAllElementsInModel(ruleItems));
             }
         }
 
@@ -315,6 +360,7 @@ namespace ClassificatorComplete.Forms
                 for (int j = 0; j < itemsForLoop.Count; j++)
                 {
                     RuleItem secondItem = itemsForLoop[j];
+
                     if (secondItem.Equals(firstItem))
                     {
                         doubledItems.Add(firstItem);
@@ -325,17 +371,22 @@ namespace ClassificatorComplete.Forms
                         && ParamUtils.nameChecker(firstItem.familyNameValue, secondItem.familyNameValue)
                         && ParamUtils.nameChecker(firstItem.typeNameValue, secondItem.typeNameValue))
                     {
+                        if (secondItem.typeNameValue.Replace("!", "").Equals(firstItem.typeNameValue) ||
+                            firstItem.typeNameValue.Replace("!", "").Equals(secondItem.typeNameValue))
+                        {
+                            continue;
+                        }
                         doubledItems.Add(firstItem);
                         doubledItems.Add(secondItem);
                         continue;
                     }
                 }
             }
-            foreach (var item in doubledItems)
+            foreach (RuleItem item in doubledItems)
             {
                 item.colourOfRule = ColourUtils.DOUBLED_RULE;
             }
-            foreach (var item in ruleItems)
+            foreach (RuleItem item in ruleItems)
             {
                 if (!doubledItems.Contains(item) && item.colourOfRule.Equals(ColourUtils.DOUBLED_RULE))
                 {

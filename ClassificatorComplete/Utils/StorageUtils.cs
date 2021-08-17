@@ -3,8 +3,7 @@ using ClassificatorComplete.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static KPLN_Loader.Output.Output;
-using static ClassificatorComplete.ModuleData;
+using static ClassificatorComplete.ApplicationConfig;
 
 namespace ClassificatorComplete
 {
@@ -38,7 +37,7 @@ namespace ClassificatorComplete
                 }
                 else return null;
             }
-            catch (Exception){ }
+            catch (Exception) { }
 
             if (utilsStorage == null)
             {
@@ -63,10 +62,41 @@ namespace ClassificatorComplete
                 storage = (InfosStorage)serializer.Deserialize(r);
             }
 
-            if(!Directory.Exists("C:\\TEMP"))
+            if (!Directory.Exists("C:\\TEMP"))
             {
                 Directory.CreateDirectory("C:\\TEMP");
             }
+
+            using (StreamWriter r = new StreamWriter(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
+            {
+                storageSerializer.Serialize(r, utilsStorage);
+            }
+
+            return storage;
+        }
+
+        public InfosStorage getStorageFromFilePath(string xmlFilePath)
+        {
+            this.xmlFilePath = xmlFilePath;
+            InfosStorage storage = new InfosStorage();
+            System.Xml.Serialization.XmlSerializer serializer =
+                new System.Xml.Serialization.XmlSerializer(typeof(InfosStorage));
+
+            using (StreamReader r = new StreamReader(xmlFilePath))
+            {
+                storage = (InfosStorage)serializer.Deserialize(r);
+            }
+
+            UtilsStorage utilsStorage = new UtilsStorage();
+            utilsStorage.path = Path.GetDirectoryName(xmlFilePath);
+
+            if (!Directory.Exists("C:\\TEMP"))
+            {
+                Directory.CreateDirectory("C:\\TEMP");
+            }
+
+            System.Xml.Serialization.XmlSerializer storageSerializer =
+                 new System.Xml.Serialization.XmlSerializer(typeof(UtilsStorage));
 
             using (StreamWriter r = new StreamWriter(string.Format("C:\\TEMP\\ccsettings{0}.xml", RevitVersion)))
             {
@@ -103,6 +133,7 @@ namespace ClassificatorComplete
 
             System.Windows.Forms.SaveFileDialog storageDialog = new System.Windows.Forms.SaveFileDialog();
             storageDialog.InitialDirectory = utilsStorage.path;
+            storageDialog.FileName = xmlFilePath != null ? Path.GetFileName(xmlFilePath) : null;
             storageDialog.Filter = "xml files (*.xml)|*.xml|All files (*.*)|*.*";
             if (storageDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {

@@ -11,22 +11,27 @@ using System.Threading.Tasks;
 
 namespace ClassificatorComplete
 {
-    class CommandFindElementsInModel : IExecutableCommand
+    class CommandFindElementsInModel : IExecutableCommand, MyExecutableCommand
     {
-        private RuleItem ruleItem;
+        private List<RuleItem> ruleItems;
 
-        public CommandFindElementsInModel(RuleItem ruleItem)
+        public CommandFindElementsInModel(List<RuleItem> ruleItems)
         {
-            this.ruleItem = ruleItem;
+            this.ruleItems = ruleItems;
         }
 
         public Result Execute(UIApplication app)
         {
             Document doc = app.ActiveUIDocument.Document;
-            List<Element> constrs = getElemsFromModel(doc, ruleItem);
+            List<Element> constrs = new List<Element>();
+            foreach (RuleItem ruleItem in ruleItems)
+            {
+                List<Element> elements = getElemsFromModel(doc, ruleItem);
+                constrs.AddRange(elements);
+                ruleItem.elemsCountInModel = elements.Count;
+            }
             Selection sel = app.ActiveUIDocument.Selection;
             sel.SetElementIds(constrs.Select(x => x.Id).ToList());
-            ruleItem.elemsCountInModel = constrs.Count;
             return Result.Succeeded;
         }
 

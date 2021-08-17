@@ -92,15 +92,18 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Availability\StaticAvailable.cs" />
-    <Compile Include="CommandFindAllElementsInModel.cs" />
-    <Compile Include="CommandFindElementsInModel.cs" />
-    <Compile Include="CommandGetElementInfo.cs" />
-    <Compile Include="CommandOpenClassificatorForm.cs" />
+    <Compile Include="Commands\CommandFindAllElementsInModel.cs" />
+    <Compile Include="Commands\CommandFindElementsInModel.cs" />
+    <Compile Include="Commands\CommandGetElementInfo.cs" />
+    <Compile Include="Commands\CommandOpenClassificatorForm.cs" />
     <Compile Include="Data\Classificator.cs" />
-    <Compile Include="CommandStartClassificator.cs" />
+    <Compile Include="Commands\CommandStartClassificator.cs" />
     <Compile Include="Data\InfosStorage.cs" />
     <Compile Include="Data\LastRunInfo.cs" />
     <Compile Include="Data\UtilsStorage.cs" />
+    <Compile Include="ExecutableCommandTools\CommandEnvironment.cs" />
+    <Compile Include="ExecutableCommandTools\KplnCommandEnvironment.cs" />
+    <Compile Include="ExecutableCommandTools\StandartCommandEnvironment.cs" />
     <Compile Include="Forms\ClassificatorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,9 +122,14 @@
     <Compile Include="Forms\ViewModels\RuleItem.cs" />
     <Compile Include="Forms\ViewModels\Settings.cs" />
     <Compile Include="Module.cs" />
-    <Compile Include="ModuleData.cs" />
-    <Compile Include="Output\OutputDebug.cs" />
+    <Compile Include="ApplicationConfig.cs" />
+    <Compile Include="ExecutableCommandTools\MyExecutableCommand.cs" />
+    <Compile Include="Output\Output.cs" />
+    <Compile Include="Output\KplnOutput.cs" />
     <Compile Include="SystemTools\WindowHandleSearch.cs" />
+    <Compile Include="UserInfo\KplnUserInfo.cs" />
+    <Compile Include="UserInfo\StandartUserInfo.cs" />
+    <Compile Include="UserInfo\UserInfo.cs" />
     <Compile Include="Utils\MyParameter.cs" />
     <Compile Include="Utils\ParamUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -138,6 +146,9 @@
     <EmbeddedResource Include="Resources\icon_manager.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Docs\slide1.png" />
+    <Content Include="Docs\slide2.png" />
+    <Content Include="Docs\slide3.png" />
     <Content Include="Resources\Классификатор_типы.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -150,5 +161,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

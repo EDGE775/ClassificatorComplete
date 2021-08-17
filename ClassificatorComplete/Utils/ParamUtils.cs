@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static KPLN_Loader.Output.Output;
-using static ClassificatorComplete.OutputDebug;
+using static ClassificatorComplete.ApplicationConfig;
 using Autodesk.Revit.DB.Architecture;
 
 namespace ClassificatorComplete
@@ -118,7 +117,8 @@ namespace ClassificatorComplete
                                     }
                                     catch (Exception)
                                     {
-                                        Print(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения конфигурационного файла. Значение не вписано в параметр: \"{1}\".", foundParamName, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                                        output.PrintInfo(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения конфигурационного файла. Значение не вписано в параметр: \"{1}\".", 
+                                            foundParamName, paramName), Output.OutputMessageType.Warning);
                                         return rsl;
                                     }
                                 }
@@ -127,7 +127,10 @@ namespace ClassificatorComplete
                                     valueOfParam = getValueStringOfAllParams(elem, foundParamNameForGettingValue);
                                     if (valueOfParam == null) valueOfParam = "";
                                 }
-                                foundParamsAndTheirValues.Add(foundParamName, valueOfParam);
+                                if (!foundParamsAndTheirValues.ContainsKey(foundParamName))
+                                {
+                                    foundParamsAndTheirValues.Add(foundParamName, valueOfParam);
+                                }
                                 break;
                             }
                         }
@@ -138,7 +141,7 @@ namespace ClassificatorComplete
                     string itemValue = foundParamsAndTheirValues[item];
                     if (itemValue == null || itemValue.Length == 0)
                     {
-                        Print(string.Format("Не заполнено значение параметра: \"{0}\" у элемента: {1} с id: {2}. Значение не вписано в параметр: \"{3}\".", item, elem.Name, elem.Id, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                        output.PrintInfo(string.Format("Не заполнено значение параметра: \"{0}\" у элемента: {1} с id: {2}. Значение не вписано в параметр: \"{3}\".", item, elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning);
                         return rsl;
                     }
                     newValue = newValue.Replace(item, itemValue);
@@ -164,21 +167,10 @@ namespace ClassificatorComplete
             }
             catch (Exception)
             {
-                Print(string.Format("Не удалось присвоить значение \"{0}\" параметру: \"{1}\" с типом данных: {2}. Элемент: {3} с id: {4}", newValue, paramName, param.StorageType.ToString(), elem.Name, elem.Id), KPLN_Loader.Preferences.MessageType.Warning);
+                output.PrintInfo(string.Format("Не удалось присвоить значение \"{0}\" параметру: \"{1}\" с типом данных: {2}. Элемент: {3} с id: {4}", 
+                    newValue, paramName, param.StorageType.ToString(), elem.Name, elem.Id), Output.OutputMessageType.Warning);
             }
             return rsl;
-        }
-
-        public static void setBuiltInParam(ElementType elem, BuiltInParameter paramName, string valueName)
-        {
-            try
-            {
-                elem.get_Parameter(paramName).Set(valueName);
-            }
-            catch (Exception e)
-            {
-                PrintError(e);
-            }
         }
 
         private void setClassificator(Classificator classificator, InfosStorage storage, Element elem, bool check)
@@ -188,10 +180,10 @@ namespace ClassificatorComplete
 
             if (classificator.paramsValues.Count > storage.instanseParams.Count)
             {
-                Print(string.Format("Значение параметра: \"{0}\" в элементе: \"{1}\" за пределами диапазона возможных значений. Присвоение данного параметра не будет выполнено."
+                output.PrintInfo(string.Format("Значение параметра: \"{0}\" в элементе: \"{1}\" за пределами диапазона возможных значений. Присвоение данного параметра не будет выполнено."
                     , classificator.paramsValues[classificator.paramsValues.Count - 1]
                     , classificator.FamilyName)
-                    , KPLN_Loader.Preferences.MessageType.Warning);
+                    , Output.OutputMessageType.Warning);
             }
             for (int i = 0; i < Math.Min(classificator.paramsValues.Count, storage.instanseParams.Count); i++)
             {
@@ -212,7 +204,7 @@ namespace ClassificatorComplete
             }
             if (check)
             {
-                Print(string.Format("Были присвоены значения: {0}", string.Join("; ", assignedValues)), KPLN_Loader.Preferences.MessageType.System_OK);
+                output.PrintInfo(string.Format("Были присвоены значения: {0}", string.Join("; ", assignedValues)), Output.OutputMessageType.System_OK);
             }
         }
 
@@ -231,7 +223,7 @@ namespace ClassificatorComplete
             }
             if (paramObject == null)
             {
-                Print(string.Format("В элементе: \"{0}\" c id: {1} не найден параметр: \"{2}\"", elem.Name, elem.Id, paramName), KPLN_Loader.Preferences.MessageType.Warning);
+                output.PrintInfo(string.Format("В элементе: \"{0}\" c id: {1} не найден параметр: \"{2}\"", elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning);
                 return paramValue;
             }
             try
@@ -250,7 +242,7 @@ namespace ClassificatorComplete
                 }
                 else
                 {
-                    Print("Не удалось определить тип параметра: " + paramName, KPLN_Loader.Preferences.MessageType.Error);
+                    output.PrintInfo("Не удалось определить тип параметра: " + paramName, Output.OutputMessageType.Error);
                 }
             }
             catch (Exception) { }
@@ -274,20 +266,20 @@ namespace ClassificatorComplete
         {
             if (constrs == null || constrs.Count == 0)
             {
-                Print("Не удалось получить элементы для заполнения классиифкатора!", KPLN_Loader.Preferences.MessageType.Error);
+                output.PrintInfo("Не удалось получить элементы для заполнения классификатора!", Output.OutputMessageType.Error);
                 return false;
             }
             foreach (Classificator classificator in storage.classificator)
             {
-                PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), KPLN_Loader.Preferences.MessageType.Code, debugMode);
+                output.PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), Output.OutputMessageType.Code, debugMode);
             }
-            PrintDebug(string.Format("Заполнение классификатора по {0} ↑", storage.instanceOrType == 1 ? "экземпляру" : "типу"), KPLN_Loader.Preferences.MessageType.Header, debugMode);
+            output.PrintDebug(string.Format("Заполнение классификатора по {0} ↑", storage.instanceOrType == 1 ? "экземпляру" : "типу"), Output.OutputMessageType.Header, debugMode);
 
             foreach (Element elem in constrs)
             {
                 string familyName = getElemFamilyName(elem);
 
-                PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), KPLN_Loader.Preferences.MessageType.System_Regular, debugMode);
+                output.PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), Output.OutputMessageType.Regular, debugMode);
                 foreach (Classificator classificator in storage.classificator)
                 {
                     bool categoryCatch = false;
@@ -297,7 +289,7 @@ namespace ClassificatorComplete
                     }
                     catch (Exception)
                     {
-                        Print(string.Format("Не удалось определить категорию: {0}. Возможно, она введена неверно.", classificator.BuiltInName), KPLN_Loader.Preferences.MessageType.Error);
+                        output.PrintInfo(string.Format("Не удалось определить категорию: {0}. Возможно, она введена неверно.", classificator.BuiltInName), Output.OutputMessageType.Error);
                     }
                     bool familyNameCatch = nameChecker(classificator.FamilyName, familyName);
                     bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);

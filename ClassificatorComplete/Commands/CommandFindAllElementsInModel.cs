@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ClassificatorComplete
 {
-    class CommandFindAllElementsInModel : IExecutableCommand
+    class CommandFindAllElementsInModel : IExecutableCommand, MyExecutableCommand
     {
         ObservableCollection<RuleItem> ruleItems;
 
