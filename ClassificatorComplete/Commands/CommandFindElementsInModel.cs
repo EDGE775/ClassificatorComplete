@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Forms.ViewModels;
-using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ClassificatorComplete
 {
-    class CommandFindElementsInModel : IExecutableCommand, MyExecutableCommand
+    class CommandFindElementsInModel : MyExecutableCommand
     {
         private List<RuleItem> ruleItems;
 

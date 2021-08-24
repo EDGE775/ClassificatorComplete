@@ -1,7 +1,9 @@
-﻿using Autodesk.Revit.UI;
+﻿#if Revit2020 || Revit2018
+using KPLN_Loader.Common;
+#endif
+using Autodesk.Revit.UI;
 using ClassificatorComplete.ExecutableCommand;
 using ClassificatorComplete.UserInfo;
-using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,10 @@ using static ClassificatorComplete.ApplicationConfig;
 namespace ClassificatorComplete
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    public class Module : IExternalModule
+    public class Module
+#if Revit2020 || Revit2018
+        : IExternalModule
+#endif
     {
         public static string assemblyPath = "";
 

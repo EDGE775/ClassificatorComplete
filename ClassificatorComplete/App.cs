@@ -17,7 +17,7 @@ namespace ClassificatorComplete
         public App()
         {
             //Конфигурирование приложения для работы в стандартной среде
-            output = new KplnOutput();
+            output = new StubOutput();
             userInfo = new StandartUserInfo();
             commandEnvironment = new StandartCommandEnvironment();
         }
@@ -26,7 +26,7 @@ namespace ClassificatorComplete
         {
             assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
-            string tabName = "BIM-STARTER";
+            string tabName = "Addins";
             try { application.CreateRibbonTab(tabName); } catch { }
 
             string panelName = "Классификатор";
@@ -45,7 +45,7 @@ namespace ClassificatorComplete
                 "ClassificatorCompleteCommand",
                 "ClassificatorComplete",
                 assemblyPath,
-                "ClassificatorComplete.Command")
+                "ClassificatorComplete.CommandOpenClassificatorForm")
                 ) as PushButton;
 
             //register events

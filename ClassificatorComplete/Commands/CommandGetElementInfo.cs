@@ -11,14 +11,13 @@ using System.Xml;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
 using ClassificatorComplete.Forms;
-using KPLN_Loader.Common;
 using Autodesk.Revit.DB.Architecture;
 using System.Windows.Forms;
 using ClassificatorComplete.Forms.ViewModels;
 
 namespace ClassificatorComplete
 {
-    public class CommandGetElementInfo : IExecutableCommand, MyExecutableCommand
+    public class CommandGetElementInfo : MyExecutableCommand
     {
         private MainWindow form;
         public List<string> paramNames;

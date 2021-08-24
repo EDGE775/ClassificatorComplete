@@ -169,7 +169,7 @@ namespace ClassificatorComplete.Forms
             {
                 Button bt = (Button)sender;
                 RuleItem ruleItem = bt.DataContext as RuleItem;
-                KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandFindElementsInModel(ruleItems.ToList()));
+                commandEnvironment.toEnqueue(new CommandFindElementsInModel(ruleItems.ToList()));
             }
             else
             {

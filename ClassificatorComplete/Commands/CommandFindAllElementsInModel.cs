@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Forms.ViewModels;
-using KPLN_Loader.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClassificatorComplete
 {
-    class CommandFindAllElementsInModel : IExecutableCommand, MyExecutableCommand
+    class CommandFindAllElementsInModel : MyExecutableCommand
     {
         ObservableCollection<RuleItem> ruleItems;
 

@@ -13,11 +13,11 @@ namespace ClassificatorComplete
     {
         public List<Element> fullSuccessElems = new List<Element>();
         public List<Element> notFullSuccessElems = new List<Element>();
-        private bool debugMode;
+        private static bool debug;
 
         public ParamUtils(bool debugMode)
         {
-            this.debugMode = debugMode;
+            debug = debugMode;
         }
 
         public static bool nameChecker(string nameClafi, string nameElem)
@@ -117,8 +117,8 @@ namespace ClassificatorComplete
                                     }
                                     catch (Exception)
                                     {
-                                        output.PrintInfo(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения конфигурационного файла. Значение не вписано в параметр: \"{1}\".", 
-                                            foundParamName, paramName), Output.OutputMessageType.Warning);
+                                        output.PrintDebug(string.Format("Значение параметра: \"{0}\" в классификаторе содержит операцию умножения (*), которое не было выполнено. Проверьте корректность заполнения конфигурационного файла. Значение не вписано в параметр: \"{1}\".", 
+                                            foundParamName, paramName), Output.OutputMessageType.Warning, debug);
                                         return rsl;
                                     }
                                 }
@@ -141,13 +141,18 @@ namespace ClassificatorComplete
                     string itemValue = foundParamsAndTheirValues[item];
                     if (itemValue == null || itemValue.Length == 0)
                     {
-                        output.PrintInfo(string.Format("Не заполнено значение параметра: \"{0}\" у элемента: {1} с id: {2}. Значение не вписано в параметр: \"{3}\".", item, elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning);
+                        output.PrintDebug(string.Format("Не заполнено значение параметра: \"{0}\" у элемента: {1} с id: {2}. Значение не вписано в параметр: \"{3}\".", item, elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning, debug);
                         return rsl;
                     }
                     newValue = newValue.Replace(item, itemValue);
                 }
             }
             Parameter param = elem.LookupParameter(paramName);
+            if (param == null)
+            {
+                output.PrintDebug(string.Format("В элементе: \"{0}\" с id: {1} не найден параметр: \"{2}\".", elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning, debug);
+                return rsl;
+            }
             try
             {
                 if (param.StorageType == StorageType.String)
@@ -173,7 +178,7 @@ namespace ClassificatorComplete
             return rsl;
         }
 
-        private void setClassificator(Classificator classificator, InfosStorage storage, Element elem, bool check)
+        private void setClassificator(Classificator classificator, InfosStorage storage, Element elem)
         {
             bool paramChecker;
             List<string> assignedValues = new List<string>();
@@ -202,10 +207,7 @@ namespace ClassificatorComplete
             {
                 notFullSuccessElems.Add(elem);
             }
-            if (check)
-            {
-                output.PrintInfo(string.Format("Были присвоены значения: {0}", string.Join("; ", assignedValues)), Output.OutputMessageType.System_OK);
-            }
+            output.PrintDebug(string.Format("Были присвоены значения: {0}", string.Join("; ", assignedValues)), Output.OutputMessageType.System_OK, debug);
         }
 
         public static string getValueStringOfAllParams(Element elem, string paramName)
@@ -271,15 +273,15 @@ namespace ClassificatorComplete
             }
             foreach (Classificator classificator in storage.classificator)
             {
-                output.PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), Output.OutputMessageType.Code, debugMode);
+                output.PrintDebug(string.Format("{0} - {1}", classificator.FamilyName, classificator.TypeName), Output.OutputMessageType.Code, debug);
             }
-            output.PrintDebug(string.Format("Заполнение классификатора по {0} ↑", storage.instanceOrType == 1 ? "экземпляру" : "типу"), Output.OutputMessageType.Header, debugMode);
+            output.PrintDebug(string.Format("Заполнение классификатора по {0} ↑", storage.instanceOrType == 1 ? "экземпляру" : "типу"), Output.OutputMessageType.Header, debug);
 
             foreach (Element elem in constrs)
             {
                 string familyName = getElemFamilyName(elem);
 
-                output.PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), Output.OutputMessageType.Regular, debugMode);
+                output.PrintDebug(string.Format("{0} : {1} : {2}", elem.Name, familyName, elem.Id.IntegerValue), Output.OutputMessageType.Regular, debug);
                 foreach (Classificator classificator in storage.classificator)
                 {
                     bool categoryCatch = false;
@@ -298,22 +300,22 @@ namespace ClassificatorComplete
 
                     if (categoryCatch && familyNameCatch && typeNameCatch && !familyNameNotExist && !typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, debugMode);
+                        setClassificator(classificator, storage, elem);
                         break;
                     }
                     if (categoryCatch && familyNameCatch && !familyNameNotExist && typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, debugMode);
+                        setClassificator(classificator, storage, elem);
                         break;
                     }
                     if (categoryCatch && typeNameCatch && familyNameNotExist && !typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, debugMode);
+                        setClassificator(classificator, storage, elem);
                         break;
                     }
                     if (categoryCatch && familyNameNotExist && typeNameNotExist)
                     {
-                        setClassificator(classificator, storage, elem, debugMode);
+                        setClassificator(classificator, storage, elem);
                         break;
                     }
                 }

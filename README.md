@@ -7,6 +7,7 @@
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Features](#features)
+* [Сompiling](#сompiling)
 * [Status](#status)
 * [Contact](#contact)
 * [Screenshots](#screenshots)
@@ -36,6 +37,12 @@ List of features
 To-do list:
 * Storing files in the DB
 * Add additional filters for items
+
+## Сompiling
+```
+msbuild ClassificatorComplete.sln /p:Configuration=Revit2020Std
+msbuild ClassificatorComplete.sln /p:Configuration=Revit2018Std
+```
 
 ## Status
 Project is: _in progress_

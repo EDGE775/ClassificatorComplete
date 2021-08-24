@@ -12,11 +12,10 @@ using static ClassificatorComplete.ApplicationConfig;
 using Autodesk.Revit.UI.Selection;
 using ClassificatorComplete.Data;
 using ClassificatorComplete.Forms;
-using KPLN_Loader.Common;
 
 namespace ClassificatorComplete
 {
-    class CommandStartClassificator : IExecutableCommand, MyExecutableCommand
+    class CommandStartClassificator : MyExecutableCommand
     {
         private ClassificatorForm form { get; set; }
 
@@ -72,8 +71,8 @@ namespace ClassificatorComplete
                     {
                         return Result.Cancelled;
                     }
-                    output.PrintInfo(string.Format("Обработано элементов: {0}", utilsForType.fullSuccessElems.Count + utilsForType.notFullSuccessElems.Count), 
-                        Output.OutputMessageType.Success);
+                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Элементов, которые были обработаны с ошибками: {1}.",
+                        utilsForType.fullSuccessElems.Count, utilsForType.notFullSuccessElems.Count), Output.OutputMessageType.Success);
                 }
 
                 else if (form.instanceOrType == 1)
@@ -90,6 +89,17 @@ namespace ClassificatorComplete
                     else
                     {
                         constrsInstances = sel.GetElementIds().Select(elem => doc.GetElement(elem)).ToList();
+                        List<Element> constrsInstancesFromGroup = new List<Element>();
+                        foreach (Element item in constrsInstances)
+                        {
+                            if (item is Group)
+                            {
+                                Group group = (Group)item;
+                                if (group == null) continue;
+                                constrsInstancesFromGroup.AddRange(group.GetMemberIds().Select(elem => doc.GetElement(elem)).ToList());
+                            }
+                        }
+                        constrsInstances.AddRange(constrsInstancesFromGroup);
                     }
 
                     ParamUtils utilsForInstanse = new ParamUtils(debugMode);
@@ -136,8 +146,8 @@ namespace ClassificatorComplete
                             catch { }
                         }
                     }
-                    output.PrintInfo(string.Format("Обработано элементов: {0}", 
-                        utilsForInstanse.fullSuccessElems.Count + utilsForInstanse.notFullSuccessElems.Count), Output.OutputMessageType.Success);
+                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Элементов, которые были обработаны с ошибками: {1}.",
+                        utilsForInstanse.fullSuccessElems.Count, utilsForInstanse.notFullSuccessElems.Count), Output.OutputMessageType.Success);
                 }
                 else
                 {
@@ -155,6 +165,20 @@ namespace ClassificatorComplete
 
                 t.Commit();
             }
+            using (StreamWriter streamWriter = new StreamWriter(string.Format("C:\\TEMP\\log_{0}.txt", DateTime.Now.ToString().Replace(".", "").Replace(":", ""))))
+            {
+                try
+                {
+                    streamWriter.WriteLine(string.Format("Классификация файла: {0}", doc.Title));
+                    streamWriter.WriteLine(output.getLog());
+                    output.PrintInfo("Отчёт о работе плагина сохранён в папке: C:\\TEMP", Output.OutputMessageType.Regular);
+                }
+                catch (Exception e)
+                {
+                    output.PrintErr(e, "Не удалось выполнить запись ЛОГ файла!");
+                }
+            }
+            output.clearLog();
             return Result.Succeeded;
         }
     }
