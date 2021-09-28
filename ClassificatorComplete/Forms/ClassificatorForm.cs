@@ -79,7 +79,6 @@ namespace ClassificatorComplete.Forms
                     BuiltInCategory cat = (BuiltInCategory)checkedItem;
                     checkedCats.Add(cat);
                 }
-                //KPLN_Loader.Preferences.CommandQueue.Enqueue(new CommandStartClassificator(this));
                 commandEnvironment.toEnqueue(new CommandStartClassificator(this));
             }
             else

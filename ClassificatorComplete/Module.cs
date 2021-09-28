@@ -72,7 +72,7 @@ namespace ClassificatorComplete
                 "Задание правил для параметризации элементов;\n" +
                 "Маппинг параметров (передача значений между параметрами элемента);\n" +
                 "Сохранение конфигурационного файла с возможностью повторного использования;\n";
-            btnHostMark.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, @"https://yandex.ru/"));
+            btnHostMark.SetContextualHelp(new ContextualHelp(ContextualHelpType.Url, @"http://moodle.stinproject.local/mod/book/view.php?id=396&chapterid=449"));
             btnHostMark.AvailabilityClassName = "ClassificatorComplete.Availability.StaticAvailable";
 
             panel.AddItem(btnHostMark);

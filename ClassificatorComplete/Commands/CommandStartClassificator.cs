@@ -71,7 +71,7 @@ namespace ClassificatorComplete
                     {
                         return Result.Cancelled;
                     }
-                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Элементов, которые были обработаны с ошибками: {1}.",
+                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Обработано с ошибками: {1}.",
                         utilsForType.fullSuccessElems.Count, utilsForType.notFullSuccessElems.Count), Output.OutputMessageType.Success);
                 }
 
@@ -146,12 +146,13 @@ namespace ClassificatorComplete
                             catch { }
                         }
                     }
-                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Элементов, которые были обработаны с ошибками: {1}.",
+                    output.PrintInfo(string.Format("Успешно обработано элементов: {0}. Обработано с ошибками: {1}.",
                         utilsForInstanse.fullSuccessElems.Count, utilsForInstanse.notFullSuccessElems.Count), Output.OutputMessageType.Success);
                 }
                 else
                 {
-                    output.PrintInfo("Выбрана некорректная операция! Проверьте конфигурационный файл.", Output.OutputMessageType.Success);
+                    output.PrintInfo("Выбрана некорректная операция! Проверьте конфигурационный файл.", Output.OutputMessageType.Error);
+                    return Result.Cancelled;
                 }
 
                 try
@@ -165,13 +166,15 @@ namespace ClassificatorComplete
 
                 t.Commit();
             }
-            using (StreamWriter streamWriter = new StreamWriter(string.Format("C:\\TEMP\\log_{0}.txt", DateTime.Now.ToString().Replace(".", "").Replace(":", ""))))
+
+            string fileName = string.Format("C:\\TEMP\\log_{0}.txt", DateTime.Now.ToString().Replace(".", "").Replace(":", ""));
+            using (StreamWriter streamWriter = new StreamWriter(fileName))
             {
                 try
                 {
                     streamWriter.WriteLine(string.Format("Классификация файла: {0}", doc.Title));
                     streamWriter.WriteLine(output.getLog());
-                    output.PrintInfo("Отчёт о работе плагина сохранён в папке: C:\\TEMP", Output.OutputMessageType.Regular);
+                    output.PrintInfo(string.Format("Отчёт о работе плагина сохранён в файле: {0}", fileName), Output.OutputMessageType.Regular);
                 }
                 catch (Exception e)
                 {

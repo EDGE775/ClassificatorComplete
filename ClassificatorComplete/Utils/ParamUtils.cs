@@ -172,8 +172,8 @@ namespace ClassificatorComplete
             }
             catch (Exception)
             {
-                output.PrintInfo(string.Format("Не удалось присвоить значение \"{0}\" параметру: \"{1}\" с типом данных: {2}. Элемент: {3} с id: {4}", 
-                    newValue, paramName, param.StorageType.ToString(), elem.Name, elem.Id), Output.OutputMessageType.Warning);
+                output.PrintDebug(string.Format("Не удалось присвоить значение \"{0}\" параметру: \"{1}\" с типом данных: {2}. Элемент: {3} с id: {4}", 
+                    newValue, paramName, param.StorageType.ToString(), elem.Name, elem.Id), Output.OutputMessageType.Warning, debug);
             }
             return rsl;
         }
@@ -185,10 +185,10 @@ namespace ClassificatorComplete
 
             if (classificator.paramsValues.Count > storage.instanseParams.Count)
             {
-                output.PrintInfo(string.Format("Значение параметра: \"{0}\" в элементе: \"{1}\" за пределами диапазона возможных значений. Присвоение данного параметра не будет выполнено."
+                output.PrintDebug(string.Format("Значение параметра: \"{0}\" в элементе: \"{1}\" за пределами диапазона возможных значений. Присвоение данного параметра не будет выполнено."
                     , classificator.paramsValues[classificator.paramsValues.Count - 1]
                     , classificator.FamilyName)
-                    , Output.OutputMessageType.Warning);
+                    , Output.OutputMessageType.Warning, debug);
             }
             for (int i = 0; i < Math.Min(classificator.paramsValues.Count, storage.instanseParams.Count); i++)
             {
@@ -225,7 +225,7 @@ namespace ClassificatorComplete
             }
             if (paramObject == null)
             {
-                output.PrintInfo(string.Format("В элементе: \"{0}\" c id: {1} не найден параметр: \"{2}\"", elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning);
+                output.PrintDebug(string.Format("В элементе: \"{0}\" c id: {1} не найден параметр: \"{2}\"", elem.Name, elem.Id, paramName), Output.OutputMessageType.Warning, debug);
                 return paramValue;
             }
             try
@@ -244,7 +244,7 @@ namespace ClassificatorComplete
                 }
                 else
                 {
-                    output.PrintInfo("Не удалось определить тип параметра: " + paramName, Output.OutputMessageType.Error);
+                    output.PrintDebug("Не удалось определить тип параметра: " + paramName, Output.OutputMessageType.Error, debug);
                 }
             }
             catch (Exception) { }
@@ -291,7 +291,7 @@ namespace ClassificatorComplete
                     }
                     catch (Exception)
                     {
-                        output.PrintInfo(string.Format("Не удалось определить категорию: {0}. Возможно, она введена неверно.", classificator.BuiltInName), Output.OutputMessageType.Error);
+                        output.PrintDebug(string.Format("Не удалось определить категорию из файла классификатора: {0}. Возможно, она введена неверно.", classificator.BuiltInName), Output.OutputMessageType.Error, debug);
                     }
                     bool familyNameCatch = nameChecker(classificator.FamilyName, familyName);
                     bool typeNameCatch = nameChecker(classificator.TypeName, elem.Name);
